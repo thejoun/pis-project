@@ -1,2 +1,1 @@
-# pis-project
-Projekt na PIS
+# Projekt na PIS
