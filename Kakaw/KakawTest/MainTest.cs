@@ -5,7 +5,7 @@ namespace KakawTest
         [Fact]
         public void SumTest()
         {
-            var sum = Kakaw.Program.Add(4, 5);
+            var sum = Kakaw.TestMe.Sum(4, 5);
             
             Assert.Equal(9, sum);
         }
