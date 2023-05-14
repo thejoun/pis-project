@@ -1,25 +1,29 @@
 using MySqlConnector;
+using UserTimelineService.Config;
 using UserTimelineService.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
+var configuration = builder.Configuration;
 
-var connectionString = builder.Configuration.GetConnectionString("Default") ?? string.Empty;
+var connectionString = configuration.GetConnectionString("Default") ?? string.Empty;
 
 services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
+services.AddOptions();
+services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"));
+
 services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connectionString));
-services.AddSingleton<IPostRepository, MySqlPostRepository>();
+services.AddScoped<IPostRepository, MySqlPostRepository>();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options => 
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "UserTimelineService v1"));
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

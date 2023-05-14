@@ -5,19 +5,18 @@ namespace UserTimelineService.Context;
 
 public class PostContext : DbContext
 {
-    // todo figure out a way to read or inject this
-    private const string ConnectionString =
-        "Server=pismysqlserv.mysql.database.azure.com;" +
-        "User ID=Admin123;" +
-        "Password=Password123!;" +
-        "Database=twittercopy";
-
+    private string _connection;
+    
     public DbSet<User> Users { get; set; }
     public DbSet<Post> Posts { get; set; }
 
+    public PostContext(string connectionString)
+    {
+        _connection = connectionString;
+    }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseMySql(ConnectionString,
-            ServerVersion.AutoDetect(ConnectionString));
+        optionsBuilder.UseMySql(_connection, ServerVersion.AutoDetect(_connection));
     }
 }

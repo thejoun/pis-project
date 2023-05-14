@@ -1,35 +1,40 @@
-﻿using System.Collections;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
 using Quickwire.Attributes;
+using UserTimelineService.Config;
 using UserTimelineService.Context;
 using UserTimelineService.Model;
 
 namespace UserTimelineService.Repository
 {
     [RegisterService(ServiceLifetime.Singleton, ServiceType = typeof(IPostRepository))]
-    public class MySqlPostRepository : IPostRepository, IDisposable
+    public class MySqlPostRepository : IPostRepository
     {
         private MySqlConnection _connection;
+        private string _connectionString;
 
-        public MySqlPostRepository(MySqlConnection connection)
+        public MySqlPostRepository(MySqlConnection connection, IOptions<ConnectionStrings> connectionStrings)
         {
-            connection.Open();
-
             _connection = connection;
+            _connectionString = connectionStrings.Value.Default;
         }
 
         public async Task<IReadOnlyCollection<Post>> GetPosts(int userId)
         {
-            await using (var context = new PostContext())
+            await _connection.OpenAsync();
+            
+            await using (var context = new PostContext(_connectionString))
             {
                 List<Post> posts = context.Posts
                     .Include(post => post.Author)
                     .ToList();
 
+                await _connection.CloseAsync();
+                
                 return posts;
             }
-
+            
             // await using var command = new MySqlCommand()
             // {
             //     CommandText = query,
@@ -46,11 +51,6 @@ namespace UserTimelineService.Repository
             // }
             //
             // return Enumerable.Empty<Post>();
-        }
-
-        public void Dispose()
-        {
-            _connection.Close();
         }
     }
 }
