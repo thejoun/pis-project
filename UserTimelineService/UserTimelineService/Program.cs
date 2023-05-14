@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using MySqlConnector;
 using UserTimelineService.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +8,10 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-// DI
-services.AddSingleton<ITimelineRepository>(new MockTimelineRepository());
+services.AddTransient<MySqlConnection>(_ =>
+    new MySqlConnection(builder.Configuration.GetConnectionString("Default")));
+
+services.AddSingleton<ITimelineRepository, MySqlTimelineRepository>();
 
 var app = builder.Build();
 

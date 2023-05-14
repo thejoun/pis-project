@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UserTimelineService.Model;
+﻿using UserTimelineService.Model;
 
 namespace UserTimelineService.Repository
 {
     public class MockTimelineRepository : ITimelineRepository
     {
-        public IEnumerable<Tweet> GetTweets(int userId)
+        public async Task<IEnumerable<Tweet>> GetTweets(int userId)
         {
             return Enumerable.Range(1, 5).Select(number => new Tweet()
             {
