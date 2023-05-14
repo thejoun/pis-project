@@ -7,7 +7,7 @@ ENV ASPNETCORE_ENVIRONMENT Development
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["UserTimelineService/UserTimelineService.csproj", "UserTimelineService/"]
+COPY ["UserTimelineService/UserTimelineService.csproj", "SocialApp/"]
 RUN dotnet restore "UserTimelineService/UserTimelineService.csproj"
 COPY . .
 WORKDIR "/src/UserTimelineService"
