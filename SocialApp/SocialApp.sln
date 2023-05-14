@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserTimelineService", "UserTimelineService\UserTimelineService.csproj", "{BB2BCB1D-9220-44A2-BB35-5B2ABD9FC1BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorClient", "BlazorClient\BlazorClient.csproj", "{62102537-4438-4F09-B80D-EED7C47E9CD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{BB2BCB1D-9220-44A2-BB35-5B2ABD9FC1BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB2BCB1D-9220-44A2-BB35-5B2ABD9FC1BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB2BCB1D-9220-44A2-BB35-5B2ABD9FC1BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62102537-4438-4F09-B80D-EED7C47E9CD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62102537-4438-4F09-B80D-EED7C47E9CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62102537-4438-4F09-B80D-EED7C47E9CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62102537-4438-4F09-B80D-EED7C47E9CD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
