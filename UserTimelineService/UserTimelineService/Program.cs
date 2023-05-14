@@ -4,14 +4,14 @@ using UserTimelineService.Repository;
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
+var connectionString = builder.Configuration.GetConnectionString("Default") ?? string.Empty;
+
 services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-services.AddTransient<MySqlConnection>(_ =>
-    new MySqlConnection(builder.Configuration.GetConnectionString("Default")));
-
-services.AddSingleton<ITimelineRepository, MySqlTimelineRepository>();
+services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connectionString));
+services.AddSingleton<IPostRepository, MySqlPostRepository>();
 
 var app = builder.Build();
 

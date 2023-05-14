@@ -11,19 +11,19 @@ namespace UserTimelineService.Controllers
     public class TimelineController : ControllerBase
     {
         private readonly ILogger<TimelineController> _logger;
-        private readonly ITimelineRepository _repository;
+        private readonly IPostRepository _repository;
 
-        public TimelineController(ITimelineRepository repository, ILogger<TimelineController> logger)
+        public TimelineController(IPostRepository repository, ILogger<TimelineController> logger)
         {
             _logger = logger;
             _repository = repository;
         }
 
         [HttpGet]
-        [Route("GetTweets")]
-        public IEnumerable<TweetDto> GetTweets(int userId)
+        [Route("GetPosts")]
+        public IEnumerable<PostDto> GetPosts(int userId)
         {
-            return _repository.GetTweets(userId).Result.Select(tweet => tweet.Map());
+            return _repository.GetPosts(userId).Result.Select(post => post.ToDto());
         }
 
         [HttpGet]

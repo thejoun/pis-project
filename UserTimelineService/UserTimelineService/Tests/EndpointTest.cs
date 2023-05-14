@@ -12,9 +12,9 @@ public class EndpointTest
     private readonly uint port;
     
     private readonly HttpClient httpClient;
-    private readonly ITimelineRepository repository;
+    private readonly IPostRepository repository;
 
-    public EndpointTest(string hostUrl, uint port, ITimelineRepository repository)
+    public EndpointTest(string hostUrl, uint port, IPostRepository repository)
     {
         this.repository = repository;
         this.hostUrl = hostUrl;
@@ -28,13 +28,13 @@ public class EndpointTest
     {
         const int userId = 0;
 
-        var fromRepository = repository.GetTweets(userId).Result;
+        var fromRepository = repository.GetPosts(userId).Result;
         var fromEndpoint = GetTweets(userId);
 
         return TestUtility.EqualCount("GetTweets", fromRepository, fromEndpoint);
     }
 
-    private IEnumerable<Tweet> GetTweets(int userId)
+    private IEnumerable<Post> GetTweets(int userId)
     {
         var task = Call(HttpMethod.Get, $"https://{hostUrl}:{port}/Timeline/GetTweets?userId={userId}");
         var result = task.Result;
@@ -42,11 +42,11 @@ public class EndpointTest
         return DeserializeTweets(result);
     }
     
-    private IEnumerable<Tweet> DeserializeTweets(string json)
+    private IEnumerable<Post> DeserializeTweets(string json)
     {
-        var tweets = JsonConvert.DeserializeObject<TweetDto[]>(json) ?? Enumerable.Empty<TweetDto>();
+        var tweets = JsonConvert.DeserializeObject<PostDto[]>(json) ?? Enumerable.Empty<PostDto>();
         
-        return tweets.Select(dto => dto.Unmap());
+        return tweets.Select(dto => dto.ToModel());
     }
     
     private async Task<string> Call(HttpMethod httpMethod, string uri)
