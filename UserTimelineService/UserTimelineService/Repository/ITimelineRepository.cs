@@ -5,6 +5,6 @@ namespace UserTimelineService.Repository
 {
     public interface ITimelineRepository
     {
-        public IEnumerable<Tweet> GetTweets(int userId);
+        public Task<IEnumerable<Tweet>> GetTweets(int userId);
     }
 }

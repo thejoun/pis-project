@@ -1,38 +1,38 @@
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using UserTimelineService.Dtos;
+using UserTimelineService.Mapping;
 using UserTimelineService.Repository;
+using UserTimelineService.Tests;
 
 namespace UserTimelineService.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class MorgueController : ControllerBase
+    public class TimelineController : ControllerBase
     {
-        private readonly ILogger<MorgueController> logger;
-        private readonly ITimelineRepository repository;
+        private readonly ILogger<TimelineController> _logger;
+        private readonly ITimelineRepository _repository;
 
-        public MorgueController(ITimelineRepository repository, ILogger<MorgueController> logger)
+        public TimelineController(ITimelineRepository repository, ILogger<TimelineController> logger)
         {
-            this.logger = logger;
-            this.repository = repository;
+            _logger = logger;
+            _repository = repository;
         }
 
         [HttpGet]
         [Route("GetTweets")]
         public IEnumerable<TweetDto> GetTweets(int userId)
         {
-            return repository.GetTweets(userId).Select(person => person.Map());
+            return _repository.GetTweets(userId).Result.Select(tweet => tweet.Map());
         }
 
         [HttpGet]
         [Route("RunTests")]
         public string RunTests(string host = "localhost", uint port = 44355)
         {
-            var test = new Test(host, port, repository);
-            return $"{test.TestGetPeople()}\n{test.TestGetShelves()}";
+            var test = new EndpointTest(host, port, _repository);
+            
+            return $"{test.TestGetTweets()}";
         }
     }
 }
