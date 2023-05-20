@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Shared.Dtos
 {
-    [JsonObject]
     public class UserDto
     {
-        [JsonProperty("id")] public int Id { get; set; }
-        [JsonProperty("username")] public string? Username { get; set; }
-        [JsonProperty("email")] public string? Email { get; set; }
-        [JsonProperty("join_date")] public DateTime JoinDate { get; set; }
+        [JsonPropertyName("id")] public int Id { get; set; }
+        [JsonPropertyName("handle")] public string? Handle { get; set; }
+        [JsonPropertyName("email")] public string? Email { get; set; }
+        [JsonPropertyName("join_date")] public DateTime? JoinDate { get; set; }
+        [JsonPropertyName("display_name")] public string? DisplayName { get; set; }
     }
 }

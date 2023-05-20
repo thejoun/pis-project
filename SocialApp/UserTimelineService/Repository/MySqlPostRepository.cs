@@ -1,14 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
-using Quickwire.Attributes;
+using Shared.Model;
 using UserTimelineService.Config;
 using UserTimelineService.Context;
-using UserTimelineService.Model;
 
 namespace UserTimelineService.Repository
 {
-    [RegisterService(ServiceLifetime.Singleton, ServiceType = typeof(IPostRepository))]
     public class MySqlPostRepository : IPostRepository
     {
         private MySqlConnection _connection;
@@ -20,14 +18,14 @@ namespace UserTimelineService.Repository
             _connectionString = connectionStrings.Value.Default;
         }
 
-        public async Task<IReadOnlyCollection<Post>> GetPosts(int userId)
+        public async Task<IReadOnlyCollection<Post>> GetPosts(string userHandle)
         {
             await _connection.OpenAsync();
             
             await using (var context = new PostContext(_connectionString))
             {
-                List<Post> posts = context.Posts
-                    .Include(post => post.Author)
+                var posts = context.Posts
+                    // .Include(post => post.AuthorId)      // there were some issues
                     .ToList();
 
                 await _connection.CloseAsync();

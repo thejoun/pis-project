@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shared.Model;
 
-namespace UserTimelineService.Context;
+namespace UserProfileService.Context;
 
-public class PostContext : DbContext
+public class UserContext : DbContext
 {
     private string _connection;
     
-    // public DbSet<User> Users { get; set; }
-    public DbSet<Post> Posts { get; set; }
+    public DbSet<User> Users { get; set; }
+    // public DbSet<Post> Posts { get; set; }
 
-    public PostContext(string connectionString)
+    public UserContext(string connectionString)
     {
         _connection = connectionString;
     }
@@ -21,6 +21,6 @@ public class PostContext : DbContext
             .UseMySql(_connection, ServerVersion.AutoDetect(_connection))
             .LogTo(Console.WriteLine, LogLevel.Information)
             .EnableSensitiveDataLogging()
-            .EnableDetailedErrors();
+            .EnableDetailedErrors();;
     }
 }

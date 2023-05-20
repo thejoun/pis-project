@@ -1,4 +1,4 @@
-﻿@page "/profile/{userid}"
+﻿@page "/profile/{userhandle}"
 @using global::Shared.Dtos
 @inject IHttpClientFactory HttpClientFactory
 
@@ -29,7 +29,7 @@ else
         {
             <tr>
                 <td>@post.Header</td>
-                <td>@post.Date.ToShortDateString()</td>
+                <td>@post.Date?.ToShortDateString()</td>
                 <td>@post.Content</td>
             </tr>
         }
@@ -40,7 +40,7 @@ else
 @code 
 {
     [Parameter]
-    public string? UserId { get; set; }
+    public string? UserHandle { get; set; }
     
     private PostDto[]? posts;
 
@@ -48,6 +48,6 @@ else
     {
         var http = HttpClientFactory.CreateClient("UserTimelineService");
         
-        posts = await http.GetFromJsonAsync<PostDto[]>($"Timeline/GetPosts?userId={UserId}");
+        posts = await http.GetFromJsonAsync<PostDto[]>($"Timeline/GetPosts?user={UserHandle}");
     }
 }

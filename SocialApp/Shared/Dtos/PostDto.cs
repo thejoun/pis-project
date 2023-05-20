@@ -1,14 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Shared.Dtos
 {
-    [JsonObject]
     public class PostDto
     {
-        [JsonProperty("id")] public int Id { get; set; }
-        [JsonProperty("author")] public UserDto? Author { get; set; }
-        [JsonProperty("header")] public string? Header { get; set; }
-        [JsonProperty("content")] public string? Content { get; set; }
-        [JsonProperty("creation_time")] public DateTime Date { get; set; }
+        [JsonPropertyName("id")] public int Id { get; set; }
+        [JsonPropertyName("author_id")] public int? AuthorId { get; set; }
+        [JsonPropertyName("header")] public string? Header { get; set; }
+        [JsonPropertyName("content")] public string? Content { get; set; }
+        [JsonPropertyName("creation_time")] public DateTime? Date { get; set; }
     }
 }

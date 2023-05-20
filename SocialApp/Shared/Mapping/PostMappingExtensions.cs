@@ -1,7 +1,7 @@
 ﻿using Shared.Dtos;
-using UserTimelineService.Model;
+using Shared.Model;
 
-namespace UserTimelineService.Mapping;
+namespace Shared.Mapping;
 
 public static class PostMappingExtensions
 {
@@ -10,7 +10,7 @@ public static class PostMappingExtensions
         return new PostDto
         {
             Id = post.Id,
-            Author = post.Author.ToDto(),
+            AuthorId = post.AuthorId,
             Header = post.Header,
             Content = post.Content,
             Date = post.Date
@@ -22,7 +22,7 @@ public static class PostMappingExtensions
         return new Post
         {
             Id = post.Id,
-            Author = post.Author.ToModel(),
+            AuthorId = post.AuthorId,
             Header = post.Header,
             Content = post.Content,
             Date = post.Date

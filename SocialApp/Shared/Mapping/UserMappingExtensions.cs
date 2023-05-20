@@ -1,7 +1,7 @@
 ﻿using Shared.Dtos;
-using UserTimelineService.Model;
+using Shared.Model;
 
-namespace UserTimelineService.Mapping;
+namespace Shared.Mapping;
 
 public static class UserMappingExtensions
 {
@@ -10,9 +10,10 @@ public static class UserMappingExtensions
         return new UserDto
         {
             Id = user.Id,
-            Username = user.Username,
+            Handle = user.Handle,
             Email = user.Email,
-            JoinDate = user.JoinDate
+            JoinDate = user.JoinDate,
+            DisplayName = user.DisplayName
         };
     }
 
@@ -21,9 +22,10 @@ public static class UserMappingExtensions
         return new User
         {
             Id = user.Id,
-            Username = user.Username,
+            Handle = user.Handle,
             Email = user.Email,
-            JoinDate = user.JoinDate
+            JoinDate = user.JoinDate,
+            DisplayName = user.DisplayName
         };
     }
 }

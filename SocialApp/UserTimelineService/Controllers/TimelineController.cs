@@ -1,8 +1,9 @@
 using System.Security.AccessControl;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos;
-using UserTimelineService.Mapping;
+using Shared.Mapping;
 using UserTimelineService.Repository;
 using UserTimelineService.Tests;
 
@@ -24,9 +25,9 @@ namespace UserTimelineService.Controllers
         [EnableCors]
         [HttpGet]
         [Route("GetPosts")]
-        public IEnumerable<PostDto> GetPosts(int userId)
+        public IEnumerable<PostDto> GetPosts(string user)
         {
-            return _repository.GetPosts(userId).Result.Select(post => post.ToDto());
+            return _repository.GetPosts(user).Result.Select(post => post.ToDto());
         }
 
         [HttpGet]

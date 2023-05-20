@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Shared.Dtos;
-using UserTimelineService.Mapping;
-using UserTimelineService.Model;
+using Shared.Mapping;
+using Shared.Model;
 using UserTimelineService.Repository;
 
 namespace UserTimelineService.Tests;
@@ -26,17 +26,17 @@ public class EndpointTest
 
     public string TestGetTweets()
     {
-        const int userId = 0;
+        const string handle = "testuser";
 
-        var fromRepository = repository.GetPosts(userId).Result;
-        var fromEndpoint = GetTweets(userId);
+        var fromRepository = repository.GetPosts(handle).Result;
+        var fromEndpoint = GetTweets(handle);
 
         return TestUtility.EqualCount("GetTweets", fromRepository, fromEndpoint);
     }
 
-    private IEnumerable<Post> GetTweets(int userId)
+    private IEnumerable<Post> GetTweets(string handle)
     {
-        var task = Call(HttpMethod.Get, $"https://{hostUrl}:{port}/Timeline/GetTweets?userId={userId}");
+        var task = Call(HttpMethod.Get, $"https://{hostUrl}:{port}/Timeline/GetTweets?user={handle}");
         var result = task.Result;
         
         return DeserializeTweets(result);

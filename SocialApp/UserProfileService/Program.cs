@@ -1,6 +1,6 @@
 using MySqlConnector;
-using UserTimelineService.Config;
-using UserTimelineService.Repository;
+using UserProfileService.Config;
+using UserProfileService.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -16,7 +16,7 @@ services.AddOptions();
 services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"));
 
 services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connectionString));
-services.AddScoped<IPostRepository, MySqlPostRepository>();
+services.AddScoped<IUserRepository, MySqlUserRepository>();
 
 services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin()));
 
