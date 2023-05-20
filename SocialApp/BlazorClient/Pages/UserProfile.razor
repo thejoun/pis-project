@@ -1,12 +1,24 @@
-﻿@page "/profile/{userhandle}"
+﻿@page "/user/{userhandle}"
 @using global::Shared.Dtos
+@using global::Shared.Mapping
+@using global::Shared.Model
 @inject IHttpClientFactory HttpClientFactory
 
 <PageTitle>User Profile</PageTitle>
 
-<h1>User Profile</h1>
+@if (user == null)
+{
+    <p>
+        <em>Fetching user...</em>
+    </p>
+}
+else
+{
+    <h1>@user.DisplayName</h1>
 
-<p>Here you can view the profile of a given user.</p>
+    <p>#@user.Handle</p>
+    <p>@user.Email</p>
+}
 
 @if (posts == null)
 {
@@ -42,12 +54,21 @@ else
     [Parameter]
     public string? UserHandle { get; set; }
     
-    private PostDto[]? posts;
+    private List<Post>? posts;
+    private User? user;
 
     protected override async Task OnInitializedAsync()
     {
-        var http = HttpClientFactory.CreateClient("UserTimelineService");
+        var timelineHttp = HttpClientFactory.CreateClient("UserTimelineService");
+        var profileHttp = HttpClientFactory.CreateClient("UserProfileService");
         
-        posts = await http.GetFromJsonAsync<PostDto[]>($"Timeline/GetPosts?user={UserHandle}");
+        posts = (await timelineHttp.GetFromJsonAsync<PostDto[]>($"Timeline/GetPosts?user={UserHandle}") 
+                 ?? Enumerable.Empty<PostDto>())
+            .Select(dto => dto.ToModel())
+            .ToList();
+        
+        user = (await profileHttp.GetFromJsonAsync<UserDto>($"Profile/GetProfile?user={UserHandle}") 
+                 ?? new UserDto())
+            .ToModel();
     }
 }

@@ -20,9 +20,9 @@ namespace UserProfileService.Controllers
         [EnableCors]
         [HttpGet]
         [Route("GetProfile")]
-        public UserDto? GetUser(string userHandle)
+        public UserDto? GetUser(string user)
         {
-            return _repository.GetUser(userHandle).Result?.ToDto();
+            return _repository.GetUser(user).Result?.ToDto();
         }
     }
 }
