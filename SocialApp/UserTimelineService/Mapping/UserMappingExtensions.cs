@@ -1,4 +1,4 @@
-﻿using UserTimelineService.Dtos;
+﻿using Shared.Dtos;
 using UserTimelineService.Model;
 
 namespace UserTimelineService.Mapping;

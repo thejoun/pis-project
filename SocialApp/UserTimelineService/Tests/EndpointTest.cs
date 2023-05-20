@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using UserTimelineService.Dtos;
+using Shared.Dtos;
 using UserTimelineService.Mapping;
 using UserTimelineService.Model;
 using UserTimelineService.Repository;

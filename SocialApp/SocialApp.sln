@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserTimelineService", "User
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorClient", "BlazorClient\BlazorClient.csproj", "{62102537-4438-4F09-B80D-EED7C47E9CD6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{170B6828-E9D5-4651-9F51-A48B28BFA833}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{62102537-4438-4F09-B80D-EED7C47E9CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62102537-4438-4F09-B80D-EED7C47E9CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62102537-4438-4F09-B80D-EED7C47E9CD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{170B6828-E9D5-4651-9F51-A48B28BFA833}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{170B6828-E9D5-4651-9F51-A48B28BFA833}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{170B6828-E9D5-4651-9F51-A48B28BFA833}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{170B6828-E9D5-4651-9F51-A48B28BFA833}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

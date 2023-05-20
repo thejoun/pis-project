@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using UserTimelineService.Dtos;
+using Shared.Dtos;
 using UserTimelineService.Mapping;
 using UserTimelineService.Repository;
 using UserTimelineService.Tests;

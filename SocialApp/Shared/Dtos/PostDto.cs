@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace UserTimelineService.Dtos
+namespace Shared.Dtos
 {
     [JsonObject]
     public class PostDto
