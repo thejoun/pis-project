@@ -1,23 +1,28 @@
-using System;
-using System.Net.Http;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BlazorClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
+var rootComponents = builder.RootComponents;
+var services = builder.Services;
 
-builder.Services.AddScoped(sp => new HttpClient
+rootComponents.Add<App>("#app");
+rootComponents.Add<HeadOutlet>("head::after");
+
+services.AddScoped(provider => new HttpClient
 {
     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
 });
 
-builder.Services.AddOidcAuthentication(options =>
+services.AddOidcAuthentication(options =>
 {
     builder.Configuration.Bind("Local", options.ProviderOptions);
+});
+
+// custom
+services.AddHttpClient("UserTimelineService", client =>
+{
+    client.BaseAddress = new Uri("http://127.0.0.1:5000/");
 });
 
 await builder.Build().RunAsync();

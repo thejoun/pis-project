@@ -1,3 +1,5 @@
+using System.Security.AccessControl;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos;
 using UserTimelineService.Mapping;
@@ -19,6 +21,7 @@ namespace UserTimelineService.Controllers
             _repository = repository;
         }
 
+        [EnableCors]
         [HttpGet]
         [Route("GetPosts")]
         public IEnumerable<PostDto> GetPosts(int userId)

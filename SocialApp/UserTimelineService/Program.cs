@@ -18,6 +18,15 @@ services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionString
 services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connectionString));
 services.AddScoped<IPostRepository, MySqlPostRepository>();
 
+services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.AllowAnyOrigin();
+        });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -25,6 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
