@@ -25,7 +25,7 @@ namespace UserTimelineService.Repository
             await using (var context = new PostContext(_connectionString))
             {
                 var posts = context.Posts
-                    // .Include(post => post.AuthorId)      // there were some issues
+                    // .Include(post => post.Author)    // not needed here, as we know the author already
                     .ToList();
 
                 await _connection.CloseAsync();

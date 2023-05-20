@@ -10,7 +10,7 @@ public static class PostMappingExtensions
         return new PostDto
         {
             Id = post.Id,
-            AuthorId = post.AuthorId,
+            Author = post.Author?.ToDto(),
             Header = post.Header,
             Content = post.Content,
             Date = post.Date
@@ -22,7 +22,7 @@ public static class PostMappingExtensions
         return new Post
         {
             Id = post.Id,
-            AuthorId = post.AuthorId,
+            Author = post.Author?.ToModel(),
             Header = post.Header,
             Content = post.Content,
             Date = post.Date
