@@ -2,27 +2,46 @@ package pis.pisjava.entities;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
+import java.sql.Timestamp;
 
 
 @Entity
 @Table(name="post")
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public class Post {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="post_id")
-    private int postId;
+    @Column(name="id")
+    private int id;
 
-    @Column(name="message")
-    private String message;
+    @Column(name="header")
+    private String header;
 
-    public Post() {
-    }
+    @Column(name="content")
+    private String content;
 
-    public Post(int postId, String message) {
-        this.postId = postId;
-        this.message = message;
+    @Column(name="create_time")
+    private Timestamp createTime;
+
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="creator_id")
+    private User creator;
+
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="category_id")
+    private Category category;
+
+    public Post(String header, String content, Timestamp createTime, User creator, Category category) {
+        this.header = header;
+        this.content = content;
+        this.createTime = createTime;
+        this.creator = creator;
+        this.category = category;
     }
 }

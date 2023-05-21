@@ -71,3 +71,4 @@ CREATE TABLE comment_thumbs_down(
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE
 );
+
