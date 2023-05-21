@@ -2,6 +2,8 @@ using MySqlConnector;
 using UserProfileService.Config;
 using UserProfileService.Repository;
 
+Console.WriteLine("Starting");
+
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
@@ -35,4 +37,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+Console.WriteLine("Running");
+
 app.Run();
+
+Console.WriteLine("Ran");
+
