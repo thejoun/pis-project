@@ -19,14 +19,21 @@ services.AddOidcAuthentication(options =>
     builder.Configuration.Bind("Local", options.ProviderOptions);
 });
 
+// these seemed not to work when set from docker-compose
+// var userTimeline = Environment.GetEnvironmentVariable("USER_TIMELINE_SERVICE");
+// var userProfile = Environment.GetEnvironmentVariable("USER_PROFILE_SERVICE");
+
+var userTimeline = "http://pisproject.eastus.azurecontainer.io:5001";
+var userProfile = "http://pisproject.eastus.azurecontainer.io:5002";
+
 // custom
 services.AddHttpClient("UserTimelineService", client =>
 {
-    client.BaseAddress = new Uri("http://127.0.0.1:5001/");
+    client.BaseAddress = new Uri(userTimeline);
 });
 services.AddHttpClient("UserProfileService", client =>
 {
-    client.BaseAddress = new Uri("http://127.0.0.1:5002/");
+    client.BaseAddress = new Uri(userProfile);
 });
 
 await builder.Build().RunAsync();
