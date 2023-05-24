@@ -1,17 +1,46 @@
 # Projekt na PIS
 
-### Deploy pojedynczych kontenerów na Azure
+## Deploy a single container to Azure
 
-Trzeba stworzyć context dla ACI, a później:
+You need to create a context for ACI, and then:
 
-`docker --context <aci-context> run -p 80:80 <user>/<image>:latest`
+```sh
+docker --context <aci-context> run -p 80:80 <user>/<image>:latest
+```
 
-### Deploy docker-compose'a
+## Deploy with docker compose to ACI
+
+Build and push to docker hub
 
 ```sh
 docker context use default
 docker compose build
 docker compose push
+```
+
+Deploy to ACI
+
+```sh
 docker context use <aci-context>
 docker compose up
+```
+
+## Build with Buildah and push to Docker Hub
+
+Login (required to push)
+```sh
+buildah login docker.io
+```
+
+Build (example for UserProfileService)
+
+```sh
+git clone https://github.com/thejoun/pis-project.git
+cd pis-project/
+buildah bud -f UserProfileService/Dockerfile -t thejoun/user-profile-service .
+```
+
+Push (example for UserProfileService)
+```sh
+buildah push thejoun/user-profile-service:latest
 ```
