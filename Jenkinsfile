@@ -1,5 +1,10 @@
+properties([pipelineTriggers([githubPush()])])
+
 pipeline {  
     agent any
+    when { 
+        changeset pattern: ".*UserProfileService.*", comparator: "REGEXP"
+    }
     environment {
         PARENT_DIR = './SocialApp/'
         PROJECT_NAME = 'UserProfileService'
@@ -8,11 +13,12 @@ pipeline {
         GITHUB_CREDENTIALS = 'github-token'
         DOCKER_CREDENTIALS = 'docker-io'
         REPO_URL = 'https://github.com/thejoun/pis-project.git'
+        BRANCH = 'main'
     }
     stages {  
         stage('Checkout') {  
             steps {
-                git credentialsId: "${GITHUB_CREDENTIALS}", url: "${REPO_URL}", branch: 'main'
+                git credentialsId: "${GITHUB_CREDENTIALS}", url: "${REPO_URL}", branch: "${BRANCH}"
                 sh 'pwd'
                 sh 'ls'
             }  
