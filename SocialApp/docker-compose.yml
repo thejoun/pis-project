@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: BlazorClient/Dockerfile
     ports:
-      - 5000:5000
+      - 80:80
     domainname: pisproject
     environment:
       - USER_TIMELINE_SERVICE=http://pisproject.eastus.azurecontainer.io:5001

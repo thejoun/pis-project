@@ -11,4 +11,4 @@ WORKDIR /var/www/web
 COPY --from=build /app/BlazorClient/output/wwwroot .
 COPY ./BlazorClient/nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 5000
+EXPOSE 80
