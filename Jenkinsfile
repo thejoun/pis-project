@@ -2,9 +2,6 @@ properties([pipelineTriggers([githubPush()])])
 
 pipeline {  
     agent any
-    when { 
-        changeset pattern: ".*UserProfileService.*", comparator: "REGEXP"
-    }
     environment {
         PARENT_DIR = './SocialApp/'
         PROJECT_NAME = 'UserProfileService'
