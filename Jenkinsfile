@@ -2,7 +2,6 @@ properties([pipelineTriggers([githubPush()])])
 
 pipeline {  
     agent any
-    
     environment {
         PARENT_DIR = './SocialApp/'
         PROJECT_NAME = 'UserProfileService'
