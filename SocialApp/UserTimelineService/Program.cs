@@ -8,6 +8,8 @@ var configuration = builder.Configuration;
 
 var connectionString = configuration.GetConnectionString("Default") ?? string.Empty;
 
+Console.WriteLine($"Is development? {builder.Environment.IsDevelopment()}");
+
 services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();

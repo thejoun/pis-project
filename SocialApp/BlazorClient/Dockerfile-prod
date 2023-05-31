@@ -4,7 +4,7 @@ WORKDIR /app
 COPY ./BlazorClient/ ./BlazorClient/
 COPY ./Shared/ ./Shared/
 WORKDIR "/app/BlazorClient"
-RUN dotnet publish -c Release -o output -r linux-x64 --self-contained /p:EnvironmentName=Development
+RUN dotnet publish -c Release -o output -r linux-x64 --self-contained
 
 FROM nginx:alpine
 WORKDIR /var/www/web

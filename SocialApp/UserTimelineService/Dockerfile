@@ -3,7 +3,9 @@ WORKDIR /app
 EXPOSE 5001
 
 ENV ASPNETCORE_URLS http://*:5001
-ENV ASPNETCORE_ENVIRONMENT Development
+
+# set this for swagger
+#ENV ASPNETCORE_ENVIRONMENT Development
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
