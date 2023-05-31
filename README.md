@@ -1,16 +1,10 @@
 # Projekt na PIS
 
-## Deploy a single container to Azure
+### Create Docker context for Azure ACI
 
-You need to create a context for ACI, and then:
+https://docs.docker.com/cloud/aci-integration/
 
-```sh
-docker --context <aci-context> run -p 80:80 <user>/<image>:latest
-```
-
-## Deploy with docker compose to ACI
-
-Build and push to docker hub
+## Build and push to docker hub
 
 ```sh
 docker context use default
@@ -18,11 +12,30 @@ docker compose build
 docker compose push
 ```
 
-Deploy to ACI
+Alterantively
 
 ```sh
-docker context use <aci-context>
-docker compose up
+./build-push.bat
+```
+
+## Deploy to Azure ACI
+
+### Deploy a single container
+
+```sh
+docker --context <aci-context> run -p 80:80 <user>/<image>:latest
+```
+
+### Deploy with docker compose
+
+```sh
+docker --context <aci-context> compose up
+```
+
+Alternatively
+
+```sh
+./deploy-aci.bat <aci-context>
 ```
 
 ## Build with Buildah and push to Docker Hub

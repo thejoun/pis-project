@@ -1,9 +1,6 @@
 services:
   blazor-client:
     image: thejoun/blazor-client
-    build:
-      context: .
-      dockerfile: BlazorClient/Dockerfile-prod
     ports:
       - 80:80
     domainname: pisproject
@@ -14,9 +11,6 @@ services:
           memory: 0.1G
   user-timeline-service:
     image: thejoun/user-timeline-service
-    build: 
-      context: .
-      dockerfile: UserTimelineService/Dockerfile
     ports:
       - 5001:5001
     domainname: pisproject
@@ -29,9 +23,6 @@ services:
           memory: 0.1G
   user-profile-service:
     image: thejoun/user-profile-service
-    build:
-      context: .
-      dockerfile: UserProfileService/Dockerfile
     ports:
       - 5002:5002
     domainname: pisproject
