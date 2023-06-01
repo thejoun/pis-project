@@ -19,4 +19,14 @@
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\Legacy\Counter.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Legacy\FetchData.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Legacy\Counter.razor" />
+      <AdditionalFiles Include="Legacy\FetchData.razor" />
+    </ItemGroup>
+
 </Project>
