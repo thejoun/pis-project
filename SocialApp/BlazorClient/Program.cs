@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BlazorClient;
 using BlazorClient.Config;
+using BlazorClient.Constants;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var rootComponents = builder.RootComponents;
@@ -17,19 +18,6 @@ var isMyDevelopment = baseAddress.Contains("localhost") || baseAddress.Contains(
 Console.WriteLine($"Is development according to ME? '{isMyDevelopment}'");
 // --------------------
 
-var servicesSection = isMyDevelopment ? "ServicesDevelopment" : "ServicesProduction";
-var servicesConfig = config.GetSection(servicesSection).Get<Services>();
-
-if (servicesConfig == null)
-{
-    Console.WriteLine($"Can't find config section '{servicesSection}'");
-}
-else
-{
-    Console.WriteLine($"UserTimelineService is '{servicesConfig.UserTimeline}'");
-    Console.WriteLine($"UserProfileService is '{servicesConfig.UserProfile}'");
-}
-
 rootComponents.Add<App>("#app");
 rootComponents.Add<HeadOutlet>("head::after");
 
@@ -38,19 +26,27 @@ services.AddScoped(_ => new HttpClient
     BaseAddress = new Uri(baseAddress)
 });
 
+var authSection = isMyDevelopment ? "AuthDevelopment" : "AuthProduction"; 
+
 services.AddOidcAuthentication(options =>
 {
-    builder.Configuration.Bind("Local", options.ProviderOptions);
+    builder.Configuration.Bind(authSection, options.ProviderOptions);
 });
 
-services.AddHttpClient("UserTimelineService", client =>
+var servicesSection = isMyDevelopment ? "ServicesDevelopment" : "ServicesProduction";
+var servicesConfig = config.GetSection(servicesSection).Get<Services>();
+
+services.AddHttpClient(Service.UserTimeline, client =>
 {
     client.BaseAddress = new Uri(servicesConfig?.UserTimeline ?? string.Empty);
 });
 
-services.AddHttpClient("UserProfileService", client =>
+services.AddHttpClient(Service.UserProfile, client =>
 {
     client.BaseAddress = new Uri(servicesConfig?.UserProfile ?? string.Empty);
 });
+
+Console.WriteLine($"UserTimelineService is '{servicesConfig?.UserTimeline}'");
+Console.WriteLine($"UserProfileService is '{servicesConfig?.UserProfile}'");
 
 await builder.Build().RunAsync();

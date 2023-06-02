@@ -20,7 +20,7 @@ services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionString
 services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connectionString));
 services.AddScoped<IUserRepository, MySqlUserRepository>();
 
-services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin()));
+services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader()));
 
 var app = builder.Build();
 

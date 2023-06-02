@@ -6,6 +6,7 @@ namespace Shared.Model
     public class User
     {
         [Column("id")] public int Id { get; set; }
+        [Column("sub")] public string? Sub { get; set; }
         [Column("handle")] public string? Handle { get; set; }
         [Column("email")] public string? Email { get; set; }
         [Column("join_date")] public DateTime? JoinDate { get; set; }

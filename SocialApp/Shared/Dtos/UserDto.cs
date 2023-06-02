@@ -9,5 +9,6 @@ namespace Shared.Dtos
         [JsonPropertyName("email")] public string? Email { get; set; }
         [JsonPropertyName("join_date")] public DateTime? JoinDate { get; set; }
         [JsonPropertyName("display_name")] public string? DisplayName { get; set; }
+        [JsonPropertyName("sub")] public string? Sub { get; set; }
     }
 }

@@ -13,7 +13,8 @@ public static class UserMappingExtensions
             Handle = user.Handle,
             Email = user.Email,
             JoinDate = user.JoinDate,
-            DisplayName = user.DisplayName
+            DisplayName = user.DisplayName,
+            Sub = user.Sub
         };
     }
 
@@ -25,7 +26,8 @@ public static class UserMappingExtensions
             Handle = user.Handle,
             Email = user.Email,
             JoinDate = user.JoinDate,
-            DisplayName = user.DisplayName
+            DisplayName = user.DisplayName,
+            Sub = user.Sub
         };
     }
 }

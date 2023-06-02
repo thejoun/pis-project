@@ -2,11 +2,19 @@
 @using global::Shared.Dtos
 @using global::Shared.Mapping
 @using global::Shared.Model
+@using BlazorClient.Constants
+@using global::Shared.Constant
 @inject IHttpClientFactory HttpClientFactory
 
 <PageTitle>User Profile</PageTitle>
 
-@if (user == null)
+@if (userNotFound)
+{
+    <p>
+        This user does not exist.
+    </p>
+}
+else if (user == null)
 {
     <p>
         <em>Fetching user...</em>
@@ -20,7 +28,11 @@ else
     <p>@user.Email</p>
 }
 
-@if (posts == null)
+@if (userNotFound)
+{
+    
+}
+else if (posts == null)
 {
     <p>
         <em>Fetching posts...</em>
@@ -57,18 +69,35 @@ else
     private List<Post>? posts;
     private User? user;
 
+    private bool userNotFound;
+    
     protected override async Task OnInitializedAsync()
     {
-        var timelineHttp = HttpClientFactory.CreateClient("UserTimelineService");
-        var profileHttp = HttpClientFactory.CreateClient("UserProfileService");
-        
-        posts = (await timelineHttp.GetFromJsonAsync<PostDto[]>($"Timeline/GetPosts?user={UserHandle}") 
+        var timelineHttp = HttpClientFactory.CreateClient(Service.UserTimeline);
+        var profileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
+
+        await profileHttp
+            .GetFromJsonAsync<UserDto>($"{Route.Request.GetProfileWithHandle}{UserHandle}")
+            .ContinueWith(async task =>
+            {
+                var userResult = (await task).ToModel();
+
+                if (userResult == null)
+                {
+                    user = new User();
+                    userNotFound = true;
+                }
+                else
+                {
+                    user = userResult;
+                }
+            });
+
+        posts = (await timelineHttp.GetFromJsonAsync<PostDto[]>($"{Route.Request.GetPostsForUserHandle}{UserHandle}") 
                  ?? Enumerable.Empty<PostDto>())
             .Select(dto => dto.ToModel())
             .ToList();
         
-        user = (await profileHttp.GetFromJsonAsync<UserDto>($"Profile/GetProfile?user={UserHandle}") 
-                 ?? new UserDto())
-            .ToModel();
+        
     }
 }
