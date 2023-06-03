@@ -28,3 +28,13 @@ services:
     environment:
       - ConnectionStrings__Default=Server=pismysqlserv.mysql.database.azure.com;Uid=Admin123;Pwd=Password123!;Database=twittercopy
       - ASPNETCORE_ENVIRONMENT=Development
+  follow-service:
+    image: thejoun/follow-service
+    build:
+      context: .
+      dockerfile: FollowService/Dockerfile
+    ports:
+      - 5003:5003
+    environment:
+      - ConnectionStrings__Default=Server=pismysqlserv.mysql.database.azure.com;Uid=Admin123;Pwd=Password123!;Database=twittercopy
+      - ASPNETCORE_ENVIRONMENT=Development

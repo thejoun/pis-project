@@ -4,14 +4,21 @@ public static class Route
 {
     public const string Profile = "Profile";
     public const string Timeline = "Timeline";
+    public const string Follow = "Follow";
 
     public const string GetProfileWithHandle = "GetProfile";
     public const string GetProfileWithSub = "GetProfileWithSub";
     public const string CreateProfile = "CreateProfile";
     public const string HasProfileWithSub = "HasProfileWithSub";
     public const string HasProfileWithHandle = "HasProfileWithHandle";
+    
     public const string GetPostsForUserHandle = "GetPosts";
     public const string AddPost = "AddPost";
+    
+    public const string GetFollowers = "GetFollowers";
+    public const string GetFollowing = "GetFollowing";
+    public const string AddFollow = "AddFollow";
+    public const string RemoveFollow = "RemoveFollow";
     
     public static class Request
     {
@@ -20,7 +27,13 @@ public static class Route
         public const string CreateProfile = Profile + "/" + Route.CreateProfile;
         public const string HasProfileWithSub = Profile + "/" + Route.HasProfileWithSub + "?sub=";
         public const string HasProfileWithHandle = Profile + "/" + Route.HasProfileWithHandle + "?handle=";
+        
         public const string GetPostsForUserHandle = Timeline + "/" + Route.GetPostsForUserHandle + "?user=";
         public const string AddPost = Timeline + "/" + Route.AddPost;
+        
+        public const string GetFollowers = Follow + "/" + Route.GetFollowers + "?user=";
+        public const string GetFollowing = Follow + "/" + Route.GetFollowing + "?user=";
+        public const string AddFollow = Follow + "/" + Route.AddFollow;
+        public const string RemoveFollow = Follow + "/" + Route.RemoveFollow;
     }
 }

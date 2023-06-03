@@ -11,5 +11,7 @@ namespace Shared.Model
         [Column("email")] public string? Email { get; set; }
         [Column("join_date")] public DateTime? JoinDate { get; set; }
         [Column("display_name")] public string? DisplayName { get; set; }
+        [Column("follower_count")] public int? FollowerCount { get; set; }
+        [Column("following_count")] public int? FollowingCount { get; set; }
     }
 }

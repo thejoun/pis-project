@@ -33,3 +33,15 @@ services:
         reservations:
           cpus: '0.1'
           memory: 0.1G
+  follow-service:
+    image: thejoun/follow-service
+    ports:
+      - 5003:5003
+    domainname: pisproject
+    environment:
+      - ConnectionStrings__Default=Server=pismysqlserv.mysql.database.azure.com;Uid=Admin123;Pwd=Password123!;Database=twittercopy
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: 0.1G
