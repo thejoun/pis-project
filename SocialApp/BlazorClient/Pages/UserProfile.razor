@@ -79,6 +79,16 @@ else
         TimelineHttp = HttpClientFactory.CreateClient(Service.UserTimeline);
         ProfileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
 
+        Init();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
         FetchProfile();
 
         FetchPosts();

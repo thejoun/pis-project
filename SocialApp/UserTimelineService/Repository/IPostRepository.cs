@@ -5,5 +5,6 @@ namespace UserTimelineService.Repository
     public interface IPostRepository
     {
         public Task<IReadOnlyCollection<Post>> GetPosts(string userHandle);
+        public Task AddPost(Post post);
     }
 }

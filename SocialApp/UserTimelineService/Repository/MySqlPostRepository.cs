@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
+using Shared.Dtos;
 using Shared.Model;
 using UserTimelineService.Config;
 using UserTimelineService.Context;
@@ -21,34 +22,28 @@ namespace UserTimelineService.Repository
         public async Task<IReadOnlyCollection<Post>> GetPosts(string userHandle)
         {
             await _connection.OpenAsync();
-            
-            await using (var context = new PostContext(_connectionString))
-            {
-                var posts = context.Posts
-                    // .Include(post => post.Author)    // not needed here, as we know the author already
-                    .ToList();
 
-                await _connection.CloseAsync();
-                
-                return posts;
-            }
+            await using var context = new PostContext(_connectionString);
             
-            // await using var command = new MySqlCommand()
-            // {
-            //     CommandText = query,
-            //     Connection = _connection
-            // };
-            //
-            // await using var reader = await command.ExecuteReaderAsync();
-            //
-            // while (await reader.ReadAsync())
-            // {
-            //     // var value = reader.GetValue(0);
-            //     
-            //     Console.WriteLine(reader.GetValue(0));
-            // }
-            //
-            // return Enumerable.Empty<Post>();
+            var posts = context.Posts.Where(post => post.Author != null 
+                                                    && post.Author.Handle == userHandle);
+
+            await _connection.CloseAsync();
+                
+            return posts.ToList();
+        }
+        
+        public async Task AddPost(Post post)
+        {
+            await _connection.OpenAsync();
+
+            await using var context = new PostContext(_connectionString);
+            
+            await context.Posts.AddAsync(post);
+            // context.Entry(post.Author).State = EntityState.Unchanged;
+            await context.SaveChangesAsync();
+
+            await _connection.CloseAsync();
         }
     }
 }
