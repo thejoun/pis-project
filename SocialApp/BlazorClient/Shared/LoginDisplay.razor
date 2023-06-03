@@ -48,7 +48,7 @@
 
         if (Sub is null) return;
         
-        ProfileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
+        ProfileHttp = HttpClientFactory.CreateClient(HttpService.Profile);
 
         await CheckIfProfileSetUp(Sub);
 

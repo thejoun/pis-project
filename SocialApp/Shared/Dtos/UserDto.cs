@@ -10,5 +10,7 @@ namespace Shared.Dtos
         [JsonPropertyName("join_date")] public DateTime? JoinDate { get; set; }
         [JsonPropertyName("display_name")] public string? DisplayName { get; set; }
         [JsonPropertyName("sub")] public string? Sub { get; set; }
+        [JsonPropertyName("followers")] public int? FollowerCount { get; set; }
+        [JsonPropertyName("following")] public int? FollowingCount { get; set; }
     }
 }

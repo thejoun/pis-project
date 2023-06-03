@@ -2,6 +2,7 @@
 using FollowService.Context;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
+using Shared.Dtos;
 using Shared.Model;
 
 namespace FollowService.Repository
@@ -45,34 +46,26 @@ namespace FollowService.Repository
             return followers;
         }
         
-        public async Task AddFollow(string followerHandle, string followingHandle)
+        public async Task<bool> IsFollowing(string followerHandle, string followingHandle)
         {
             await _connection.OpenAsync();
             await using var context = new FollowContext(_connectionString);
 
-            if (!TryGetUsers(context, followerHandle, followingHandle, out var follower, out var following))
-            {
-                return;
-            }
-
-            var follow = new Follow()
-            {
-                FollowerUser = follower,
-                FollowingUser = following
-            };
-
-            context.Follows.Add(follow);
-            await context.SaveChangesAsync();
+            var isFollowing = context.Follows.Any(follow => follow.FollowerUser != null 
+                                                            && follow.FollowingUser != null
+                                                            && follow.FollowerUser.Handle == followerHandle
+                                                            && follow.FollowingUser.Handle == followingHandle);
 
             await _connection.CloseAsync();
+            return isFollowing;
         }
-
-        public async Task RemoveFollow(string followerHandle, string followingHandle)
+        
+        public async Task AddFollow(FollowDto follow)
         {
             await _connection.OpenAsync();
             await using var context = new FollowContext(_connectionString);
 
-            if (!TryGetUsers(context, followerHandle, followingHandle, out var follower, out var following))
+            if (!TryGetUsers(context, follow, out var follower, out var following))
             {
                 return;
             }
@@ -80,12 +73,56 @@ namespace FollowService.Repository
             var followerId = follower?.Id;
             var followingId = following?.Id;
 
-            var follow = context.Follows.FirstOrDefault(follow => follow.Follower == followerId
-                                                                  && follow.Following == followingId);
+            var existingFollow = context.Follows.FirstOrDefault(f => f.Follower == followerId 
+                                                                     && f.Following == followingId);
 
-            if (follow is not null)
+            if (existingFollow == null)
             {
-                context.Follows.Remove(follow);
+                var newFollow = new Follow
+                {
+                    FollowerUser = follower,
+                    FollowingUser = following
+                };
+
+                context.Follows.Add(newFollow);
+
+                follower.FollowingCount++;
+                following.FollowerCount++;
+
+                context.Users.Update(follower);
+                context.Users.Update(following);
+            
+                await context.SaveChangesAsync();
+            }
+
+            await _connection.CloseAsync();
+        }
+
+        public async Task RemoveFollow(FollowDto follow)
+        {
+            await _connection.OpenAsync();
+            await using var context = new FollowContext(_connectionString);
+
+            if (!TryGetUsers(context, follow, out var follower, out var following))
+            {
+                return;
+            }
+
+            var followerId = follower?.Id;
+            var followingId = following?.Id;
+
+            var existingFollow = context.Follows.FirstOrDefault(f => f.Follower == followerId 
+                                                                     && f.Following == followingId);
+
+            if (existingFollow is not null)
+            {
+                context.Follows.Remove(existingFollow);
+                
+                follower.FollowingCount--;
+                following.FollowerCount--;
+
+                context.Users.Update(follower);
+                context.Users.Update(following);
                 
                 await context.SaveChangesAsync();
             }
@@ -93,11 +130,11 @@ namespace FollowService.Repository
             await _connection.CloseAsync();
         }
 
-        private static bool TryGetUsers(FollowContext context, string followerHandle, string followingHandle,
+        private static bool TryGetUsers(FollowContext context, FollowDto follow,
             out User? follower, out User? following)
         {
-            follower = context.Users.FirstOrDefault(user => user.Handle == followerHandle);
-            following = context.Users.FirstOrDefault(user => user.Handle == followingHandle);
+            follower = context.Users.FirstOrDefault(user => user.Handle == follow.Follower);
+            following = context.Users.FirstOrDefault(user => user.Handle == follow.Following);
 
             if (follower == null)
             {

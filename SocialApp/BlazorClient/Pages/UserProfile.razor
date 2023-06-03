@@ -1,20 +1,20 @@
 ﻿@page "/user/{userhandle}"
 @using global::Shared.Dtos
-@using global::Shared.Mapping
-@using global::Shared.Model
 @using BlazorClient.Constants
+@using BlazorClient.Helpers
 @using global::Shared.Constant
 @inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>User Profile</PageTitle>
 
-@if (userNotFound)
+@if (UserFound == false)
 {
     <p>
         This user does not exist.
     </p>
 }
-else if (user == null)
+else if (User == null)
 {
     <p>
         <em>Fetching user...</em>
@@ -22,17 +22,44 @@ else if (user == null)
 }
 else
 {
-    <h1>@user.DisplayName</h1>
+    <h1>@User.DisplayName</h1>
 
-    <p>#@user.Handle</p>
-    <p>@user.Email</p>
+    <p>#@User.Handle</p>
+    
+    @if (User.Email is not null)
+    {
+        <p>@User.Email</p>
+    }
+
+    <p>@User.FollowerCount followers, @User.FollowingCount following</p>
 }
 
-@if (userNotFound)
+@if (IsOwnProfile == false && IsFollowing == false)
+{
+    <p>
+        <button class="btn btn-primary" @onclick="Follow">Follow</button>
+    </p>
+}
+else if (IsOwnProfile == false && IsFollowing == true)
+{
+    <p>
+        <button class="btn btn-primary" @onclick="Unfollow">Unfollow</button>
+        You're following this user!
+    </p>
+}
+
+@if (IsFollower == true)
+{
+    <p>
+        This user is following you!
+    </p>
+}
+
+@if (UserFound == false)
 {
     
 }
-else if (posts == null)
+else if (Posts == null)
 {
     <p>
         <em>Fetching posts...</em>
@@ -49,7 +76,7 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var post in posts)
+        @foreach (var post in Posts)
         {
             <tr>
                 <td>@post.Header</td>
@@ -66,62 +93,155 @@ else
     [Parameter]
     public string? UserHandle { get; set; }
     
-    private List<Post>? posts;
-    private User? user;
-
-    private bool userNotFound;
-    
     private HttpClient TimelineHttp;
     private HttpClient ProfileHttp;
+    private HttpClient FollowHttp;
 
+    private string? Sub;
+    
+    private UserDto? User;
+    private List<PostDto>? Posts;
+
+    private UserDto? OwnProfile;
+
+    private bool? UserFound;
+    private bool? IsFollowing;
+    private bool? IsFollower;
+    
+    private bool CheckedFollow;
+
+    private bool? IsOwnProfile => User is null || OwnProfile is null 
+        ? null 
+        : User?.Handle == OwnProfile?.Handle;
+    
     protected override async Task OnInitializedAsync()
     {
-        TimelineHttp = HttpClientFactory.CreateClient(Service.UserTimeline);
-        ProfileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
+        TimelineHttp = HttpClientFactory.CreateClient(HttpService.Timeline);
+        ProfileHttp = HttpClientFactory.CreateClient(HttpService.Profile);
+        FollowHttp = HttpClientFactory.CreateClient(HttpService.Follow);
 
-        Init();
+        await Init();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        Init();
+        await Init();
     }
 
-    private void Init()
+    private async Task Init()
     {
+        User = null;
+        UserFound = null;
+        IsFollowing = null;
+        IsFollower = null;
+        
+        StateHasChanged();
+        
         FetchProfile();
-
         FetchPosts();
+
+        if (await AuthenticationStateProvider.GetGoogleUserSub() != null)
+        {
+            FetchOwnProfile();
+        }
+    }
+
+    private async Task Follow()
+    {
+        var url = $"{Route.Request.AddFollow}";
+
+        var follow = new FollowDto()
+        {
+            Follower = OwnProfile?.Handle,
+            Following = User?.Handle
+        };
+
+        await FollowHttp.PostAsJsonAsync(url, follow);
+
+        await Task.Delay(1000);
+        
+        FetchIsFollowing();
+        FetchProfile();
+    }
+
+    private async Task Unfollow()
+    {
+        var url = $"{Route.Request.RemoveFollow}";
+
+        var follow = new FollowDto()
+        {
+            Follower = OwnProfile?.Handle,
+            Following = User?.Handle
+        };
+        
+        await FollowHttp.PostAsJsonAsync(url, follow);
+
+        await Task.Delay(1000);
+        
+        FetchIsFollowing();
+        FetchProfile();
     }
 
     private async Task FetchProfile()
     {
-        await ProfileHttp
-            .GetFromJsonAsync<UserDto>($"{Route.Request.GetProfileWithHandle}{UserHandle}")
-            .ContinueWith(async task =>
-            {
-                var userResult = (await task).ToModel();
+        var url = $"{Route.Request.GetProfileWithHandle}{UserHandle}";
 
-                if (userResult == null)
-                {
-                    user = new User();
-                    userNotFound = true;
-                }
-                else
-                {
-                    user = userResult;
-                }
-            });
+        User = await ProfileHttp.GetFromJsonAsync<UserDto?>(url);
+
+        UserFound = User != null;
+
+        StateHasChanged();
+        
+        await OnProfileFetched();
+    }
+
+    private async Task FetchOwnProfile()
+    {
+        Sub = await AuthenticationStateProvider.GetGoogleUserSub();
+        
+        var url = $"{Route.Request.GetProfileWithSub}{Sub}";
+
+        OwnProfile = await ProfileHttp.GetFromJsonAsync<UserDto?>(url);
         
         StateHasChanged();
+
+        await OnProfileFetched();
     }
 
     private async Task FetchPosts()
     {
-        posts = (await TimelineHttp.GetFromJsonAsync<PostDto[]>($"{Route.Request.GetPostsForUserHandle}{UserHandle}")
-                 ?? Enumerable.Empty<PostDto>())
-            .Select(dto => dto.ToModel())
-            .ToList();
+        var url = $"{Route.Request.GetPostsForUserHandle}{UserHandle}";
+        
+        Posts = (await TimelineHttp.GetFromJsonAsync<PostDto[]>(url) ?? Enumerable.Empty<PostDto>()).ToList();
+        
+        StateHasChanged();
+    }
+
+    private async Task OnProfileFetched()
+    {
+        if (User != null && OwnProfile != null && !CheckedFollow)
+        {
+            CheckedFollow = true;
+
+            FetchIsFollowing();
+            FetchIsFollower();
+        }
+    }
+
+    private async Task FetchIsFollowing()
+    {
+        var url = Route.Request.IsFollowing(OwnProfile?.Handle, User?.Handle);
+
+        IsFollowing = await FollowHttp.GetFromJsonAsync<bool>(url);
+        
+        StateHasChanged();
+    }
+    
+    private async Task FetchIsFollower()
+    {
+        var url = Route.Request.IsFollowing(User?.Handle, OwnProfile?.Handle);
+
+        IsFollower = await FollowHttp.GetFromJsonAsync<bool>(url);
         
         StateHasChanged();
     }

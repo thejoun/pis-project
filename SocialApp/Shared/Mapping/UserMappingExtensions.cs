@@ -14,7 +14,9 @@ public static class UserMappingExtensions
             Email = user.Email,
             JoinDate = user.JoinDate,
             DisplayName = user.DisplayName,
-            Sub = user.Sub
+            Sub = user.Sub,
+            FollowerCount = user.FollowerCount,
+            FollowingCount = user.FollowingCount
         };
     }
 
@@ -27,7 +29,9 @@ public static class UserMappingExtensions
             Email = user.Email,
             JoinDate = user.JoinDate,
             DisplayName = user.DisplayName,
-            Sub = user.Sub
+            Sub = user.Sub,
+            FollowerCount = user.FollowerCount,
+            FollowingCount = user.FollowingCount
         };
     }
 }

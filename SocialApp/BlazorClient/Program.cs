@@ -36,17 +36,13 @@ services.AddOidcAuthentication(options =>
 var servicesSection = isMyDevelopment ? "ServicesDevelopment" : "ServicesProduction";
 var servicesConfig = config.GetSection(servicesSection).Get<Services>();
 
-services.AddHttpClient(Service.UserTimeline, client =>
-{
-    client.BaseAddress = new Uri(servicesConfig?.UserTimeline ?? string.Empty);
-});
+services.AddHttpClient(HttpService.Timeline, 
+    client => client.BaseAddress = new Uri(servicesConfig?.Timeline ?? string.Empty));
 
-services.AddHttpClient(Service.UserProfile, client =>
-{
-    client.BaseAddress = new Uri(servicesConfig?.UserProfile ?? string.Empty);
-});
+services.AddHttpClient(HttpService.Profile, 
+    client => client.BaseAddress = new Uri(servicesConfig?.Profile ?? string.Empty));
 
-Console.WriteLine($"UserTimelineService is '{servicesConfig?.UserTimeline}'");
-Console.WriteLine($"UserProfileService is '{servicesConfig?.UserProfile}'");
+services.AddHttpClient(HttpService.Follow, 
+    client => client.BaseAddress = new Uri(servicesConfig?.Follow ?? string.Empty));
 
 await builder.Build().RunAsync();

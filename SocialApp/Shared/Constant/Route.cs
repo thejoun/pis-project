@@ -19,7 +19,8 @@ public static class Route
     public const string GetFollowing = "GetFollowing";
     public const string AddFollow = "AddFollow";
     public const string RemoveFollow = "RemoveFollow";
-    
+    public const string IsFollowing = "IsFollowing";
+
     public static class Request
     {
         public const string GetProfileWithHandle = Profile + "/" + Route.GetProfileWithHandle + "?user=";
@@ -35,5 +36,9 @@ public static class Route
         public const string GetFollowing = Follow + "/" + Route.GetFollowing + "?user=";
         public const string AddFollow = Follow + "/" + Route.AddFollow;
         public const string RemoveFollow = Follow + "/" + Route.RemoveFollow;
+        
+        public static string IsFollowing(string? follower, string? following) => Follow + "/" + Route.IsFollowing +
+                                                                               $"?follower={follower}" +
+                                                                               $"&following={following}";
     }
 }

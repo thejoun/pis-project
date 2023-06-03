@@ -60,8 +60,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ProfileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
-        TimelineHttp = HttpClientFactory.CreateClient(Service.UserTimeline);
+        ProfileHttp = HttpClientFactory.CreateClient(HttpService.Profile);
+        TimelineHttp = HttpClientFactory.CreateClient(HttpService.Timeline);
         
         Sub = await AuthenticationStateProvider.GetGoogleUserSub();
         

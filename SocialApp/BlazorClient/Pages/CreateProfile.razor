@@ -149,7 +149,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ProfileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
+        ProfileHttp = HttpClientFactory.CreateClient(HttpService.Profile);
 
         await CheckProfileExists();
     }

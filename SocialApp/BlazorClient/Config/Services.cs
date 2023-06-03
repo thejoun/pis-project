@@ -5,6 +5,7 @@
 /// </summary>
 public class Services
 {
-    public string UserTimeline { get; set; } = string.Empty;
-    public string UserProfile { get; set; } = string.Empty;
+    public string Timeline { get; set; } = string.Empty;
+    public string Profile { get; set; } = string.Empty;
+    public string Follow { get; set; } = string.Empty;
 }

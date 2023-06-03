@@ -28,9 +28,12 @@ namespace FollowService.Controllers
             .Select(user => user?.ToDto());
         
         [HttpPost] [EnableCors] [Route(Route.AddFollow)]
-        public void Follow(string follower, string following) => _repository.AddFollow(follower, following);
+        public void Follow(FollowDto follow) => _repository.AddFollow(follow);
         
         [HttpPost] [EnableCors] [Route(Route.RemoveFollow)]
-        public void Unfollow(string follower, string following) => _repository.RemoveFollow(follower, following);
+        public void Unfollow(FollowDto follow) => _repository.RemoveFollow(follow);
+        
+        [HttpGet] [EnableCors] [Route(Route.IsFollowing)]
+        public bool IsFollowing(string follower, string following) => _repository.IsFollowing(follower, following).Result;
     }
 }
