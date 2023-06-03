@@ -7,7 +7,7 @@
 
     <main>
         <div class="top-row px-4 auth">
-            <LoginDisplay/>
+            <LoginDisplay @ref="LoginDisplay"/>
             @* <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a> *@
         </div>
 
@@ -16,3 +16,10 @@
         </article>
     </main>
 </div>
+
+@code
+{
+    // this is how you get references to components
+    [Parameter] 
+    LoginDisplay LoginDisplay { get; set; }
+}

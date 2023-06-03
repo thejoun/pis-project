@@ -71,12 +71,22 @@ else
 
     private bool userNotFound;
     
+    private HttpClient TimelineHttp;
+    private HttpClient ProfileHttp;
+
     protected override async Task OnInitializedAsync()
     {
-        var timelineHttp = HttpClientFactory.CreateClient(Service.UserTimeline);
-        var profileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
+        TimelineHttp = HttpClientFactory.CreateClient(Service.UserTimeline);
+        ProfileHttp = HttpClientFactory.CreateClient(Service.UserProfile);
 
-        await profileHttp
+        FetchProfile();
+
+        FetchPosts();
+    }
+
+    private async Task FetchProfile()
+    {
+        await ProfileHttp
             .GetFromJsonAsync<UserDto>($"{Route.Request.GetProfileWithHandle}{UserHandle}")
             .ContinueWith(async task =>
             {
@@ -92,12 +102,17 @@ else
                     user = userResult;
                 }
             });
+        
+        StateHasChanged();
+    }
 
-        posts = (await timelineHttp.GetFromJsonAsync<PostDto[]>($"{Route.Request.GetPostsForUserHandle}{UserHandle}") 
+    private async Task FetchPosts()
+    {
+        posts = (await TimelineHttp.GetFromJsonAsync<PostDto[]>($"{Route.Request.GetPostsForUserHandle}{UserHandle}")
                  ?? Enumerable.Empty<PostDto>())
             .Select(dto => dto.ToModel())
             .ToList();
         
-        
+        StateHasChanged();
     }
 }

@@ -3,7 +3,7 @@
 @using BlazorClient.Helpers
 @using global::Shared.Constant
 @using global::Shared.Dtos
-@using global::Shared.Model
+@inject NavigationManager Navigation
 @inject IHttpClientFactory HttpClientFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -23,7 +23,7 @@
             
                 <p>
                     Handle
-                    <input type="text" @bind="Handle"/>
+                    <input type="text" @bind="Handle" @oninput="OnHandleInput"/>
                     <button class="btn btn-primary" @onclick="CheckHandle">Check availability</button>
                 </p>
                 <p>
@@ -47,6 +47,8 @@
             else if (ProfileCreated == true)
             {
                 <p>Profile created!</p>
+                
+                <button class="btn btn-primary" @onclick="MyProfile">Take a look!</button>
             }
             else if (ProfileCreated == false)
             {
@@ -77,6 +79,15 @@
     private bool? HandleAvailable { get; set; }
     private bool? ProfileCreated { get; set; }
 
+    private async void OnHandleInput()
+    {
+        HandleAvailable = null;
+        
+        StateHasChanged();
+    }
+
+    private void MyProfile() => Navigation.NavigateTo($"user/{Handle}");
+    
     private async void Create()
     {
         var user = new UserDto()
@@ -100,6 +111,8 @@
         {
             ProfileCreated = false;
         }
+        
+        StateHasChanged();
     }
     
     private async void CheckHandle()
@@ -113,6 +126,8 @@
         var url = $"{Route.Request.HasProfileWithHandle}{Handle}";
         
         HandleAvailable = !await ProfileHttp.GetFromJsonAsync<bool>(url);
+        
+        StateHasChanged();
     }
 
     private async Task CheckProfileExists()
@@ -128,6 +143,8 @@
         var url = $"{Route.Request.HasProfileWithSub}{Sub}";
 
         IsProfileSetUp = await ProfileHttp.GetFromJsonAsync<bool>(url);
+        
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
