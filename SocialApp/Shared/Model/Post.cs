@@ -11,6 +11,6 @@ namespace Shared.Model
         [Column("content")] public string? Content { get; set; }
         [Column("creation_time")] public DateTime? Date { get; set; }
         
-        [ForeignKey("Author_Id")] public User Author { get; set; }
+        [ForeignKey("Author_Id")] public User? Author { get; set; }
     }
 }

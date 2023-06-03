@@ -9,6 +9,7 @@ public class PostContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Post> Posts { get; set; }
+    public DbSet<Follow> Follows { get; set; }
 
     public PostContext(string connectionString)
     {

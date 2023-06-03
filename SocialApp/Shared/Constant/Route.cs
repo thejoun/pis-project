@@ -14,7 +14,8 @@ public static class Route
     
     public const string GetPostsForUserHandle = "GetPosts";
     public const string AddPost = "AddPost";
-    
+    public const string GetHomeTimeline = "GetHomeTimeline";
+
     public const string GetFollowers = "GetFollowers";
     public const string GetFollowing = "GetFollowing";
     public const string AddFollow = "AddFollow";
@@ -32,13 +33,15 @@ public static class Route
         public const string GetPostsForUserHandle = Timeline + "/" + Route.GetPostsForUserHandle + "?user=";
         public const string AddPost = Timeline + "/" + Route.AddPost;
         
+        public static string GetHomeTimeline(string? user, int skip, int take) 
+            => Timeline + "/" + Route.GetHomeTimeline + $"?user={user}&skip={skip}&take={take}";
+        
         public const string GetFollowers = Follow + "/" + Route.GetFollowers + "?user=";
         public const string GetFollowing = Follow + "/" + Route.GetFollowing + "?user=";
         public const string AddFollow = Follow + "/" + Route.AddFollow;
         public const string RemoveFollow = Follow + "/" + Route.RemoveFollow;
         
-        public static string IsFollowing(string? follower, string? following) => Follow + "/" + Route.IsFollowing +
-                                                                               $"?follower={follower}" +
-                                                                               $"&following={following}";
+        public static string IsFollowing(string? follower, string? following) 
+            => Follow + "/" + Route.IsFollowing + $"?follower={follower}&following={following}";
     }
 }

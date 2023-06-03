@@ -25,8 +25,7 @@ namespace UserTimelineService.Repository
 
             await using var context = new PostContext(_connectionString);
             
-            var posts = context.Posts.Where(post => post.Author != null 
-                                                    && post.Author.Handle == userHandle);
+            var posts = context.Posts.Where(post => post.Author.Handle == userHandle);
 
             await _connection.CloseAsync();
                 
@@ -44,6 +43,28 @@ namespace UserTimelineService.Repository
             await context.SaveChangesAsync();
 
             await _connection.CloseAsync();
+        }
+        
+        public async Task<IReadOnlyCollection<Post>> GetHomeTimelineForUser(string userHandle, int skip, int take)
+        {
+            await _connection.OpenAsync();
+
+            await using var context = new PostContext(_connectionString);
+
+            var following = context.Follows
+                .Where(follow => follow.FollowerUser != null && follow.FollowerUser.Handle == userHandle)
+                .Select(follow => follow.Following);
+
+            var posts = context.Posts
+                .Include(post => post.Author)
+                .Where(post => following.Contains(post.Author_Id))
+                .OrderByDescending(post => post.Date)
+                .Skip(skip)
+                .Take(take);
+
+            await _connection.CloseAsync();
+                
+            return posts.ToList();
         }
     }
 }

@@ -80,7 +80,7 @@ else
         {
             <tr>
                 <td>@post.Header</td>
-                <td>@post.Date?.ToShortDateString()</td>
+                <td>@post.Date?.ToShortDateString() @post.Date?.ToShortTimeString()</td>
                 <td>@post.Content</td>
             </tr>
         }

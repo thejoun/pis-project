@@ -27,7 +27,11 @@ namespace UserTimelineService.Controllers
 
         [HttpPost] [EnableCors] [Route(Route.AddPost)]
         public void AddPost(RawPostDto post) => _repository.AddPost(post.ToModel());
-
+        
+        [HttpGet] [EnableCors] [Route(Route.GetHomeTimeline)]
+        public IEnumerable<PostDto> GetHomeTimelineForUser(string user, int skip, int take)
+            => _repository.GetHomeTimelineForUser(user, skip, take).Result.Select(post => post.ToDto()); 
+        
         [Obsolete]
         [HttpGet] [Route("RunTests")]
         public string RunTests(string host = "localhost", uint port = 44355)
