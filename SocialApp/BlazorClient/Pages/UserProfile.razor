@@ -25,7 +25,7 @@ else
     <h1>@User.DisplayName</h1>
 
     <p>#@User.Handle</p>
-    
+
     @if (User.Email is not null)
     {
         <p>@User.Email</p>
@@ -57,7 +57,7 @@ else if (IsOwnProfile == false && IsFollowing == true)
 
 @if (UserFound == false)
 {
-    
+
 }
 else if (Posts == null)
 {
@@ -69,56 +69,102 @@ else
 {
     <table class="table">
         <thead>
-        <tr>
-            <th>Header</th>
-            <th>Date</th>
-            <th>Content</th>
-        </tr>
+            <tr>
+                <th>Header</th>
+                <th>Date</th>
+                <th>Content</th>
+            </tr>
         </thead>
         <tbody>
-        @foreach (var post in Posts)
-        {
-            <tr>
-                <td>@post.Header</td>
-                <td>@post.Date?.ToShortDateString() @post.Date?.ToShortTimeString()</td>
-                <td>@post.Content</td>
-            </tr>
-        }
+            @foreach (var post in Posts)
+            {
+                <tr>
+                    <td>@post.Header</td>
+                    <td>@post.Date?.ToShortDateString() @post.Date?.ToShortTimeString()</td>
+                    <td>@post.Content</td>
+                </tr>
+                @foreach (var comment in Comments)
+                {
+                    @* @if (comment.PostId == post.Id)
+        { *@
+                    <tr>
+                        <td>@comment.Author</td>
+                        <td>@comment.Date?.ToShortDateString() @comment.Date?.ToShortTimeString()</td>
+                        <td>@comment.Content</td>
+                        <td>@comment.PostId</td>
+                    </tr>
+                    @* } *@
+                }
+                <p>
+                    <tr>
+                        @if (AddCommentSelectedPostId != post.Id)
+                        {
+                            <button class="btn btn-primary" @onclick="() => AddComment(post.Id)">Add Comment</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="RemoveComment">Remove Comment</button>
+                            <input type="content" @bind="Content" />
+                            <button class="btn btn-primary" @onclick="Comment">Post Comment</button>
+                        }
+                    </tr>
+
+                </p>
+            }
         </tbody>
     </table>
 }
 
-@code 
+@code
 {
     [Parameter]
     public string? UserHandle { get; set; }
-    
-    private HttpClient TimelineHttp;
-    private HttpClient ProfileHttp;
-    private HttpClient FollowHttp;
+
+    private HttpClient? ProfileHttp { get; set; }
+    private HttpClient? TimelineHttp { get; set; }
+    private HttpClient? FollowHttp { get; set; }
 
     private string? Sub;
-    
+
     private UserDto? User;
     private List<PostDto>? Posts;
-
+    private List<CommentDto>? Comments;
     private UserDto? OwnProfile;
+
+    private int UserId;
+    private string? Content;
+    private bool? IsProfileSetUp { get; set; }
+    private bool? CommentCreated { get; set; }
+
+    private int AddCommentSelectedPostId { get; set; }
+
 
     private bool? UserFound;
     private bool? IsFollowing;
     private bool? IsFollower;
-    
+
     private bool CheckedFollow;
 
-    private bool? IsOwnProfile => User is null || OwnProfile is null 
-        ? null 
-        : User?.Handle == OwnProfile?.Handle;
-    
+    private bool? IsOwnProfile => User is null || OwnProfile is null
+    ? null
+    : User?.Handle == OwnProfile?.Handle;
+
     protected override async Task OnInitializedAsync()
     {
         TimelineHttp = HttpClientFactory.CreateClient(HttpService.Timeline);
         ProfileHttp = HttpClientFactory.CreateClient(HttpService.Profile);
-        FollowHttp = HttpClientFactory.CreateClient(HttpService.Follow);
+
+        Sub = await AuthenticationStateProvider.GetGoogleUserSub();
+
+        var url = $"{Route.Request.GetProfileWithSub}{Sub}";
+        var profile = await ProfileHttp.GetFromJsonAsync<UserDto?>(url);
+
+        IsProfileSetUp = profile != null;
+
+        if (profile != null)
+        {
+            UserId = profile.Id;
+        }
 
         await Init();
     }
@@ -134,11 +180,12 @@ else
         UserFound = null;
         IsFollowing = null;
         IsFollower = null;
-        
+
         StateHasChanged();
-        
+
         FetchProfile();
         FetchPosts();
+        FetchComments();
 
         if (await AuthenticationStateProvider.GetGoogleUserSub() != null)
         {
@@ -151,15 +198,15 @@ else
         var url = $"{Route.Request.AddFollow}";
 
         var follow = new FollowDto()
-        {
-            Follower = OwnProfile?.Handle,
-            Following = User?.Handle
-        };
+            {
+                Follower = OwnProfile?.Handle,
+                Following = User?.Handle
+            };
 
         await FollowHttp.PostAsJsonAsync(url, follow);
 
         await Task.Delay(1000);
-        
+
         FetchIsFollowing();
         FetchProfile();
     }
@@ -169,15 +216,15 @@ else
         var url = $"{Route.Request.RemoveFollow}";
 
         var follow = new FollowDto()
-        {
-            Follower = OwnProfile?.Handle,
-            Following = User?.Handle
-        };
-        
+            {
+                Follower = OwnProfile?.Handle,
+                Following = User?.Handle
+            };
+
         await FollowHttp.PostAsJsonAsync(url, follow);
 
         await Task.Delay(1000);
-        
+
         FetchIsFollowing();
         FetchProfile();
     }
@@ -191,18 +238,18 @@ else
         UserFound = User != null;
 
         StateHasChanged();
-        
+
         await OnProfileFetched();
     }
 
     private async Task FetchOwnProfile()
     {
         Sub = await AuthenticationStateProvider.GetGoogleUserSub();
-        
+
         var url = $"{Route.Request.GetProfileWithSub}{Sub}";
 
         OwnProfile = await ProfileHttp.GetFromJsonAsync<UserDto?>(url);
-        
+
         StateHasChanged();
 
         await OnProfileFetched();
@@ -211,9 +258,18 @@ else
     private async Task FetchPosts()
     {
         var url = $"{Route.Request.GetPostsForUserHandle}{UserHandle}";
-        
+
         Posts = (await TimelineHttp.GetFromJsonAsync<PostDto[]>(url) ?? Enumerable.Empty<PostDto>()).ToList();
-        
+
+        StateHasChanged();
+    }
+
+    private async Task FetchComments()
+    {
+        var url = $"{Route.Request.GetCommentsForUserHandle}{UserHandle}";
+
+        Comments = (await TimelineHttp.GetFromJsonAsync<CommentDto[]>(url) ?? Enumerable.Empty<CommentDto>()).ToList();
+
         StateHasChanged();
     }
 
@@ -233,16 +289,53 @@ else
         var url = Route.Request.IsFollowing(OwnProfile?.Handle, User?.Handle);
 
         IsFollowing = await FollowHttp.GetFromJsonAsync<bool>(url);
-        
+
         StateHasChanged();
     }
-    
+
     private async Task FetchIsFollower()
     {
         var url = Route.Request.IsFollowing(User?.Handle, OwnProfile?.Handle);
 
         IsFollower = await FollowHttp.GetFromJsonAsync<bool>(url);
-        
+
+        StateHasChanged();
+    }
+
+    private async void AddComment(int id)
+    {
+        AddCommentSelectedPostId = id;
+    }
+
+    private async void RemoveComment()
+    {
+        AddCommentSelectedPostId = -1;
+    }
+
+    private async void Comment()
+    {
+        var comment = new RawCommentDto()
+            {
+                PostId = AddCommentSelectedPostId,
+                AuthorId = UserId,
+                Content = Content,
+                Date = DateTime.Now
+            };
+
+        var url = $"{Route.Request.AddComment}";
+        var response = await TimelineHttp.PostAsJsonAsync(url, comment);
+
+        if (response.IsSuccessStatusCode)
+        {
+            CommentCreated = true;
+        }
+        else
+        {
+            CommentCreated = false;
+        }
+
+        RemoveComment();
+
         StateHasChanged();
     }
 }

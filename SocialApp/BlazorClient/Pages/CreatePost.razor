@@ -12,13 +12,13 @@
     <Authorized>
         <p>
             Header
-            <input type="text" @bind="Header"/>
+            <input type="text" @bind="Header" />
         </p>
         <p>
             Content
             <input type="search" @bind="Content" />
         </p>
-        
+
         @if (IsProfileSetUp == false)
         {
             <p>Set up your profile before posting!</p>
@@ -44,14 +44,14 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@code 
+@code
 {
     private HttpClient? ProfileHttp { get; set; }
     private HttpClient? TimelineHttp { get; set; }
 
     private string? Header;
     private string? Content;
-    
+
     private string? Sub { get; set; }
     private int UserId;
 
@@ -62,9 +62,9 @@
     {
         ProfileHttp = HttpClientFactory.CreateClient(HttpService.Profile);
         TimelineHttp = HttpClientFactory.CreateClient(HttpService.Timeline);
-        
+
         Sub = await AuthenticationStateProvider.GetGoogleUserSub();
-        
+
         var url = $"{Route.Request.GetProfileWithSub}{Sub}";
         var profile = await ProfileHttp.GetFromJsonAsync<UserDto?>(url);
 
@@ -79,16 +79,16 @@
     private async void Post()
     {
         var post = new RawPostDto()
-        {
-            AuthorId = UserId,
-            Header = Header,
-            Content = Content,
-            Date = DateTime.Now
-        };
-        
+            {
+                AuthorId = UserId,
+                Header = Header,
+                Content = Content,
+                Date = DateTime.Now
+            };
+
         var url = $"{Route.Request.AddPost}";
         var response = await TimelineHttp.PostAsJsonAsync(url, post);
-        
+
         if (response.IsSuccessStatusCode)
         {
             PostCreated = true;
@@ -97,7 +97,7 @@
         {
             PostCreated = false;
         }
-        
+
         StateHasChanged();
     }
 }
