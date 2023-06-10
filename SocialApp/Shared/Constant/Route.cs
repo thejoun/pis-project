@@ -14,6 +14,7 @@ public static class Route
 
     public const string GetPostsForUserHandle = "GetPosts";
     public const string GetCommentsForUserHandle = "GetComments";
+    public const string GetComments = "GetComments";
     public const string AddPost = "AddPost";
     public const string AddComment = "AddComment";
     public const string GetHomeTimeline = "GetHomeTimeline";
@@ -35,6 +36,7 @@ public static class Route
 
         public const string GetPostsForUserHandle = Timeline + "/" + Route.GetPostsForUserHandle + "?user=";
         public const string GetCommentsForUserHandle = Timeline + "/" + Route.GetCommentsForUserHandle + "?user=";
+        public const string GetComments = Timeline + "/" + Route.GetComments;
         public const string AddPost = Timeline + "/" + Route.AddPost;
         public const string AddComment = Timeline + "/" + Route.AddComment;
 

@@ -19,13 +19,13 @@ namespace UserTimelineService.Repository
             _connectionString = connectionStrings.Value.Default;
         }
 
-        public async Task<IReadOnlyCollection<Comment>> GetComments(string userHandle)
+        public async Task<IReadOnlyCollection<Comment>> GetComments()
         {
             await _connection.OpenAsync();
 
             await using var context = new CommentContext(_connectionString);
 
-            var comments = context.Comments.Where(comment => comment.Author.Handle == userHandle);
+            var comments = context.Comments;
 
             await _connection.CloseAsync();
 
@@ -45,14 +45,14 @@ namespace UserTimelineService.Repository
             await _connection.CloseAsync();
         }
 
-        public async Task<IReadOnlyCollection<Comment>> GetHomeTimelineForUserComment(string userHandle, int skip, int take)
+        public async Task<IReadOnlyCollection<Comment>> GetHomeTimelineForUserComment(int skip, int take)
         {
             await _connection.OpenAsync();
 
             await using var context = new CommentContext(_connectionString);
 
             var comments = context.Comments
-                .Include(comment => comment.Author)
+                //.Include(comment => comment.Author)
                 //.Where(comment => following.Contains(comment.Author_Id))
                 .OrderByDescending(comment => comment.Date)
                 .Skip(skip)

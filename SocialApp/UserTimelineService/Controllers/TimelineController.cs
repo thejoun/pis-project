@@ -31,8 +31,8 @@ namespace UserTimelineService.Controllers
 
         [HttpGet]
         [EnableCors]
-        [Route(Route.GetCommentsForUserHandle)]
-        public IEnumerable<CommentDto> GetComments(string user) => _repositoryComment.GetComments(user).Result.Select(comment => comment.ToDto());
+        [Route(Route.GetComments)]
+        public IEnumerable<CommentDto> GetComments() => _repositoryComment.GetComments().Result.Select(comment => comment.ToDto());
 
         [HttpPost]
         [EnableCors]
@@ -53,8 +53,8 @@ namespace UserTimelineService.Controllers
         [HttpGet]
         [EnableCors]
         [Route(Route.GetHomeTimeline2)]
-        public IEnumerable<CommentDto> GetHomeTimelineForUserComment(string user, int skip, int take)
-                    => _repositoryComment.GetHomeTimelineForUserComment(user, skip, take).Result.Select(comment => comment.ToDto());
+        public IEnumerable<CommentDto> GetHomeTimelineForUserComment(int skip, int take)
+                    => _repositoryComment.GetHomeTimelineForUserComment(skip, take).Result.Select(comment => comment.ToDto());
 
         [Obsolete]
         [HttpGet]

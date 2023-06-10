@@ -82,20 +82,20 @@ else
                     <td>@post.Header</td>
                     <td>@post.Date?.ToShortDateString() @post.Date?.ToShortTimeString()</td>
                     <td>@post.Content</td>
-                    <td>@Comments.Count</td>
                 </tr>
 
-                @foreach (var comment in Comments)
+                @if (Comments != null)
                 {
-                    @if (comment.PostId == post.Id)
+                    @foreach (var comment in Comments)
                     {
-                        <tr>
-                            <td>Comment:</td>
-                            <td>@comment.Author</td>
-                            <td>@comment.Date?.ToShortDateString() @comment.Date?.ToShortTimeString()</td>
-                            <td>@comment.Content</td>
-                            <td>@comment.PostId</td>
-                        </tr>
+                        @if (comment.PostId == post.Id)
+                        {
+                            <tr>
+                                @* <td>Comment by: @comment.Author.DisplayName</td> *@
+                                <td>@comment.Date?.ToShortDateString() @comment.Date?.ToShortTimeString()</td>
+                                <td>@comment.Content</td>
+                            </tr>
+                        }
                     }
                 }
                 <p>
@@ -272,6 +272,16 @@ else
         var url = $"{Route.Request.GetCommentsForUserHandle}{UserHandle}";
 
         Comments = (await TimelineHttp.GetFromJsonAsync<CommentDto[]>(url) ?? Enumerable.Empty<CommentDto>()).ToList();
+        if (Comments.Count == 0)
+        {
+            url = $"{Route.Request.GetComments}";
+            Comments = (await TimelineHttp.GetFromJsonAsync<CommentDto[]>(url) ?? Enumerable.Empty<CommentDto>()).ToList();
+        }
+        if (Comments.Count == 0)
+        {
+            url = $"{Route.Request.GetCommentsForUserHandle}";
+            Comments = (await TimelineHttp.GetFromJsonAsync<CommentDto[]>(url) ?? Enumerable.Empty<CommentDto>()).ToList();
+        }
 
         StateHasChanged();
     }
@@ -338,7 +348,7 @@ else
         }
 
         RemoveComment();
-
         StateHasChanged();
+        await Init();
     }
 }
