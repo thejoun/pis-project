@@ -11,14 +11,14 @@
 @if (UserFound == false)
 {
     <p>
-        This user does not exist.
-    </p>
+    This user does not exist.
+</p>
 }
 else if (User == null)
 {
     <p>
-        <em>Fetching user...</em>
-    </p>
+    <em>Fetching user...</em>
+</p>
 }
 else
 {
@@ -37,22 +37,22 @@ else
 @if (IsOwnProfile == false && IsFollowing == false)
 {
     <p>
-        <button class="btn btn-primary" @onclick="Follow">Follow</button>
-    </p>
+    <button class="btn btn-primary" @onclick="Follow">Follow</button>
+</p>
 }
 else if (IsOwnProfile == false && IsFollowing == true)
 {
     <p>
-        <button class="btn btn-primary" @onclick="Unfollow">Unfollow</button>
-        You're following this user!
-    </p>
+    <button class="btn btn-primary" @onclick="Unfollow">Unfollow</button>
+    You're following this user!
+</p>
 }
 
 @if (IsFollower == true)
 {
     <p>
-        This user is following you!
-    </p>
+    This user is following you!
+</p>
 }
 
 @if (UserFound == false)
@@ -62,42 +62,45 @@ else if (IsOwnProfile == false && IsFollowing == true)
 else if (Posts == null)
 {
     <p>
-        <em>Fetching posts...</em>
-    </p>
+    <em>Fetching posts...</em>
+</p>
 }
 else
 {
     <table class="table">
-        <thead>
-            <tr>
-                <th>Header</th>
-                <th>Date</th>
-                <th>Content</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var post in Posts)
+    <thead>
+        <tr>
+            <th>Header</th>
+            <th>Date</th>
+            <th>Content</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var post in Posts)
             {
                 <tr>
                     <td>@post.Header</td>
                     <td>@post.Date?.ToShortDateString() @post.Date?.ToShortTimeString()</td>
                     <td>@post.Content</td>
+                    <td>@Comments.Count</td>
                 </tr>
+
                 @foreach (var comment in Comments)
                 {
-                    @* @if (comment.PostId == post.Id)
-        { *@
-                    <tr>
-                        <td>@comment.Author</td>
-                        <td>@comment.Date?.ToShortDateString() @comment.Date?.ToShortTimeString()</td>
-                        <td>@comment.Content</td>
-                        <td>@comment.PostId</td>
-                    </tr>
-                    @* } *@
+                    @if (comment.PostId == post.Id)
+                    {
+                        <tr>
+                            <td>Comment:</td>
+                            <td>@comment.Author</td>
+                            <td>@comment.Date?.ToShortDateString() @comment.Date?.ToShortTimeString()</td>
+                            <td>@comment.Content</td>
+                            <td>@comment.PostId</td>
+                        </tr>
+                    }
                 }
                 <p>
-                    <tr>
-                        @if (AddCommentSelectedPostId != post.Id)
+            <tr>
+                @if (AddCommentSelectedPostId != post.Id)
                         {
                             <button class="btn btn-primary" @onclick="() => AddComment(post.Id)">Add Comment</button>
                         }

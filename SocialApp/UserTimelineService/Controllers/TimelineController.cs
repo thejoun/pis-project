@@ -32,7 +32,7 @@ namespace UserTimelineService.Controllers
         [HttpGet]
         [EnableCors]
         [Route(Route.GetCommentsForUserHandle)]
-        public IEnumerable<CommentDto> GetComments(string user) => _repositoryComment.GetComments(user).Result.Select(post => post.ToDto());
+        public IEnumerable<CommentDto> GetComments(string user) => _repositoryComment.GetComments(user).Result.Select(comment => comment.ToDto());
 
         [HttpPost]
         [EnableCors]
