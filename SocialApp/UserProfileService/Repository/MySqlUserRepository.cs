@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
+using Shared.Exceptions;
 using Shared.Model;
 using UserProfileService.Config;
 using UserProfileService.Context;
@@ -27,8 +28,13 @@ namespace UserProfileService.Repository
             // but had some problems with it
             var user = context.Users.FirstOrDefault(user => user.Handle == userHandle);
 
+            if (user == null)
+            {
+                throw new NotFoundException($"User with handle '{userHandle}'");
+            }
+            
             await _connection.CloseAsync();
-                
+            
             return user;
         }
         
@@ -38,6 +44,11 @@ namespace UserProfileService.Repository
             await using var context = new UserContext(_connectionString);
             
             var user = context.Users.FirstOrDefault(user => user.Sub != null && user.Sub == sub);
+            
+            if (user == null)
+            {
+                throw new NotFoundException($"User with sub '{sub}'");
+            }
 
             await _connection.CloseAsync();
                 
@@ -51,7 +62,7 @@ namespace UserProfileService.Repository
             
             if (await context.Users.AnyAsync(u => u.Handle == user.Handle))
             {
-                return;
+                throw new AlreadyExistsException($"User with handle '{user.Handle}'");
             }
 
             var newUser = new User()
