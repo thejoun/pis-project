@@ -1,8 +1,6 @@
-# Projekt na PIS
+# Kakaw (aka SoialApp)
 
-### Create Docker context for Azure ACI
-
-https://docs.docker.com/cloud/aci-integration/
+A highly discouraged solution for all your instant messaging needs.
 
 ## Build and push to docker hub
 
@@ -19,6 +17,10 @@ Alterantively
 ```
 
 ## Deploy to Azure ACI
+
+### Create Docker context for Azure ACI
+
+https://docs.docker.com/cloud/aci-integration/
 
 ### Deploy a single container
 
