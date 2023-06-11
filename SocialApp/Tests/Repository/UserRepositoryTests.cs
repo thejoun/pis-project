@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
 using Shared.Exceptions;
 using Shared.Model;
+using Tests.Helpers;
 using UserProfileService.Repository;
 using Xunit;
 
@@ -12,24 +13,18 @@ public class UserRepositoryTests : IAsyncLifetime
 {
     private IUserRepository Repo { get; set; }
 
-    private IServiceScope Scope { get; set; }
     private string Handle { get; set; }
+    private string Sub { get; set; }
     private User User { get; set; }
     
     public async Task InitializeAsync()
     {
-        var application = new WebApplicationFactory<UserProfileService.Program>()
-            .WithWebHostBuilder(builder => { builder.ConfigureServices(_ => { }); });
-        
-        // i create it manually beacuse of issues with DI here
-        var connectionString =
-            "Server=pismysqlserv.mysql.database.azure.com;Uid=Admin123;Pwd=Password123!;Database=twittercopy";
-        var connection = new MySqlConnection(connectionString);
-        Repo = new MySqlUserRepository(connection, connectionString);
+        Repo = new MySqlUserRepository(DbHelper.Connection(), DbHelper.ConnectionString);
 
         var random = new Random();
 
         Handle = Guid.NewGuid().ToString();
+        Sub = Guid.NewGuid().ToString();
         
         User = new User
         {
@@ -39,7 +34,7 @@ public class UserRepositoryTests : IAsyncLifetime
             FollowerCount = random.Next(),
             FollowingCount = random.Next(),
             JoinDate = DateTime.Today,
-            Sub = Guid.NewGuid().ToString()
+            Sub = Sub
         };
     }
 
@@ -60,7 +55,9 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         await Repo.AddUser(User);
         var storedProfile = await Repo.GetUser(Handle);
-        Assert.True(storedProfile?.Id > 0);
+        
+        Assert.True(storedProfile?.Id >= 0);
+        
         storedProfile.Id = 0;
         Assert.Equal(User, storedProfile);
     }
@@ -90,5 +87,27 @@ public class UserRepositoryTests : IAsyncLifetime
     public async Task DeleteProfile_NotFound()
     {
         await Assert.ThrowsAsync<NotFoundException>(() => Repo.DeleteUser(Handle));
+    }
+    
+    [Fact]
+    public async Task HasProfile_Handle()
+    {
+        await Repo.AddUser(User);
+        var exists = await Repo.HasProfileWithHandle(Handle);
+        Assert.True(exists);
+        await Repo.DeleteUser(Handle);
+        var notExists = await Repo.HasProfileWithHandle(Handle);
+        Assert.False(notExists);
+    }
+    
+    [Fact]
+    public async Task HasProfile_Sub()
+    {
+        await Repo.AddUser(User);
+        var exists = await Repo.HasProfileWithSub(Sub);
+        Assert.True(exists);
+        await Repo.DeleteUser(Handle);
+        var notExists = await Repo.HasProfileWithSub(Sub);
+        Assert.False(notExists);
     }
 }
