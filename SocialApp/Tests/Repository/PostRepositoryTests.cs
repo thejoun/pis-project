@@ -43,7 +43,7 @@ public class PostRepositoryTests : IAsyncLifetime
             Author_Id = random.Next(),
             Header = Guid.NewGuid().ToString(),
             Content = Guid.NewGuid().ToString(),
-            Date = DateTime.Now,
+            Date = DateTime.Today + TimeSpan.FromHours(13) + TimeSpan.FromMinutes(13),
             Author = User
         };
     }
@@ -64,6 +64,7 @@ public class PostRepositoryTests : IAsyncLifetime
     public async Task AddPost()
     {
         await Repo.AddPost(Post);
+        PostId = Post.Id;
         var posts = await Repo.GetPosts(Handle);
         var latestPost = posts.FirstOrDefault();
         
