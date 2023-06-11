@@ -35,9 +35,7 @@ namespace UserTimelineService.Repository
         public async Task AddComment(Comment comment)
         {
             await _connection.OpenAsync();
-
             await using var context = new CommentContext(_connectionString);
-
             await context.Comments.AddAsync(comment);
             // context.Entry(comment.Author).State = EntityState.Unchanged;
             await context.SaveChangesAsync();

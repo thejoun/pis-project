@@ -8,6 +8,7 @@ public class CommentContext : DbContext
     private string _connection;
 
     public DbSet<Comment> Comments { get; set; }
+    public DbSet<User_Comment> user_comments { get; set; }
 
     public CommentContext(string connectionString)
     {

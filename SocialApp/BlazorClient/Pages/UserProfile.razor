@@ -11,14 +11,14 @@
 @if (UserFound == false)
 {
     <p>
-    This user does not exist.
-</p>
+        This user does not exist.
+    </p>
 }
 else if (User == null)
 {
     <p>
-    <em>Fetching user...</em>
-</p>
+        <em>Fetching user...</em>
+    </p>
 }
 else
 {
@@ -37,22 +37,22 @@ else
 @if (IsOwnProfile == false && IsFollowing == false)
 {
     <p>
-    <button class="btn btn-primary" @onclick="Follow">Follow</button>
-</p>
+        <button class="btn btn-primary" @onclick="Follow">Follow</button>
+    </p>
 }
 else if (IsOwnProfile == false && IsFollowing == true)
 {
     <p>
-    <button class="btn btn-primary" @onclick="Unfollow">Unfollow</button>
-    You're following this user!
-</p>
+        <button class="btn btn-primary" @onclick="Unfollow">Unfollow</button>
+        You're following this user!
+    </p>
 }
 
 @if (IsFollower == true)
 {
     <p>
-    This user is following you!
-</p>
+        This user is following you!
+    </p>
 }
 
 @if (UserFound == false)
@@ -62,21 +62,21 @@ else if (IsOwnProfile == false && IsFollowing == true)
 else if (Posts == null)
 {
     <p>
-    <em>Fetching posts...</em>
-</p>
+        <em>Fetching posts...</em>
+    </p>
 }
 else
 {
     <table class="table">
-    <thead>
-        <tr>
-            <th>Header</th>
-            <th>Date</th>
-            <th>Content</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var post in Posts)
+        <thead>
+            <tr>
+                <th>Header</th>
+                <th>Date</th>
+                <th>Content</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var post in Posts)
             {
                 <tr>
                     <td>@post.Header</td>
@@ -91,25 +91,33 @@ else
                         @if (comment.PostId == post.Id)
                         {
                             <tr>
-                                @if (comment.AuthorName != null)
-                                {
-                                        <td>Comment by: @comment.AuthorName</td>
-                                }
-                                else
-                                {
-<td>UserId : @UserId</td>
-                                }
+                                <td>Comment by: @comment.AuthorName</td>
                                 <td>@comment.Date?.ToShortDateString() @comment.Date?.ToShortTimeString()</td>
                                 <td>@comment.Content</td>
                                 <td>Likes: @comment.likes</td>
-                                <button class="btn btn-primary" @onclick="() => LikeComment(comment)">Like</button>
+                                @if (UCLs == null)
+                                {
+                                    <button class="btn btn-primary" @onclick="() => LikeComment(comment)">Like</button>
+                                }
+                                else if (UCLs.Count == 0)
+                                {
+                                    <button class="btn btn-primary" @onclick="() => LikeComment(comment)">Like</button>
+                                }
+                                else if (UCLs.Find(x => x.UserId == OwnProfile.Id && x.CommentId == comment.Id) != null)
+                                {
+                                    <td>Already liked</td>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary" @onclick="() => LikeComment(comment)">Like</button>
+                                }
                             </tr>
                         }
                     }
                 }
                 <p>
-            <tr>
-                @if (AddCommentSelectedPostId != post.Id)
+                    <tr>
+                        @if (AddCommentSelectedPostId != post.Id)
                         {
                             <button class="btn btn-primary" @onclick="() => AddComment(post.Id)">Add Comment</button>
                         }
@@ -141,6 +149,7 @@ else
     private UserDto? User;
     private List<PostDto>? Posts;
     private List<CommentDto>? Comments;
+    private List<User_CommentLikedDto>? UCLs;
     private UserDto? OwnProfile;
 
     private int UserId;
@@ -198,6 +207,7 @@ else
         FetchProfile();
         FetchPosts();
         FetchComments();
+        FetchUserCommentsLikes();
 
         if (await AuthenticationStateProvider.GetGoogleUserSub() != null)
         {
@@ -284,6 +294,15 @@ else
         StateHasChanged();
     }
 
+    private async Task FetchUserCommentsLikes()
+    {
+        var url = $"{Route.Request.GetUCL}";
+        UCLs = (await TimelineHttp.GetFromJsonAsync<User_CommentLikedDto[]>(url) ??
+        Enumerable.Empty<User_CommentLikedDto>()).ToList();
+
+        StateHasChanged();
+    }
+
     private async Task OnProfileFetched()
     {
         if (User != null && OwnProfile != null && !CheckedFollow)
@@ -326,14 +345,15 @@ else
     private async void Comment()
     {
         var comment = new RawCommentDto()
-        {
-            PostId = AddCommentSelectedPostId,
-            AuthorId = UserId,
-            Content = Content,
-            Date = DateTime.Now,
-            likes = 0,
-            AuthorName = OwnProfile.DisplayName,
-        };
+            {
+                PostId = AddCommentSelectedPostId,
+                AuthorId = UserId,
+                Content = Content,
+                Date = DateTime.Now,
+                likes = 0,
+                AuthorName = OwnProfile.DisplayName,
+            };
+
 
         var url = $"{Route.Request.AddComment}";
         var response = await TimelineHttp.PostAsJsonAsync(url, comment);
@@ -347,8 +367,11 @@ else
             CommentCreated = false;
         }
 
-        RemoveComment();
         await FetchComments();
+
+        RemoveComment();
+
+        await FetchUserCommentsLikes();
         await Init();
         StateHasChanged();
     }
@@ -356,19 +379,31 @@ else
     private async void LikeComment(CommentDto comment)
     {
         RawCommentDto rawComment = new RawCommentDto
-        {
-            PostId = comment.PostId,
-            Id = comment.Id,
-            Content = comment.Content,
-            Date = comment.Date,
-            likes = comment.likes,
-            AuthorName = comment.AuthorName,
-        };
+            {
+                PostId = comment.PostId,
+                Id = comment.Id,
+                Content = comment.Content,
+                Date = comment.Date,
+                likes = comment.likes,
+                AuthorName = comment.AuthorName,
+            };
         var url = $"{Route.Request.AddLike}";
         var response = await TimelineHttp.PostAsJsonAsync(url, rawComment);
 
+
+
+        User_CommentLikedDto ucDto = new User_CommentLikedDto
+            {
+                UserId = OwnProfile.Id,
+                CommentId = comment.Id,
+            };
+        var url2 = $"{Route.Request.AddUCL}";
+        var response2 = await TimelineHttp.PostAsJsonAsync(url2, ucDto);
+
+
         await FetchComments();
-        await Init();
+        await FetchUserCommentsLikes();
         StateHasChanged();
+        await Init();
     }
 }

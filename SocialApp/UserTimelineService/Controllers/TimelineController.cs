@@ -17,11 +17,14 @@ namespace UserTimelineService.Controllers
         private readonly IPostRepository _repository;
         private readonly ICommentRepository _repositoryComment;
 
-        public TimelineController(IPostRepository repository, ILogger<TimelineController> logger, ICommentRepository repositoryComment)
+        private readonly IUCLRepository _repositoryUCL;
+
+        public TimelineController(IPostRepository repository, ILogger<TimelineController> logger, ICommentRepository repositoryComment, IUCLRepository repositoryUCL)
         {
             _logger = logger;
             _repository = repository;
             _repositoryComment = repositoryComment;
+            _repositoryUCL = repositoryUCL;
         }
 
         [HttpGet]
@@ -33,6 +36,11 @@ namespace UserTimelineService.Controllers
         [EnableCors]
         [Route(Route.GetComments)]
         public IEnumerable<CommentDto> GetComments() => _repositoryComment.GetComments().Result.Select(comment => comment.ToDto());
+
+        [HttpGet]
+        [EnableCors]
+        [Route(Route.GetUCL)]
+        public IEnumerable<User_CommentLikedDto> GetUCL() => _repositoryUCL.GetUCL().Result.Select(ucl => ucl.ToDto());
 
         [HttpPost]
         [EnableCors]
@@ -48,6 +56,16 @@ namespace UserTimelineService.Controllers
         [EnableCors]
         [Route(Route.AddLike)]
         public void AddLike(RawCommentDto comment) => _repositoryComment.AddLike(comment.ToModel());
+
+        [HttpPost]
+        [EnableCors]
+        [Route(Route.AddUCL)]
+        public void AddUCL(User_CommentLikedDto ucl) => _repositoryUCL.AddUCL(ucl.ToModel());
+
+        [HttpPost]
+        [EnableCors]
+        [Route(Route.RemoveUCL)]
+        public void RemoveUCL(User_CommentLikedDto ucl) => _repositoryUCL.RemoveUCL(ucl.ToModel());
 
 
         [HttpGet]
