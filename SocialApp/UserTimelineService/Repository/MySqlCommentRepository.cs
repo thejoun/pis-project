@@ -58,6 +58,21 @@ namespace UserTimelineService.Repository
             await _connection.CloseAsync();
         }
 
+        public async Task RemoveLike(Comment comment)
+        {
+            await _connection.OpenAsync();
+
+            await using var context = new CommentContext(_connectionString);
+
+            Comment c = context.Comments.FirstOrDefault(i => i.Id == comment.Id);
+            c.likes -= 1;
+            comment.likes -= 1;
+
+            await context.SaveChangesAsync();
+
+            await _connection.CloseAsync();
+        }
+
 
         public async Task<IReadOnlyCollection<Comment>> GetHomeTimelineForUserComment(int skip, int take)
         {

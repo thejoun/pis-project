@@ -59,6 +59,11 @@ namespace UserTimelineService.Controllers
 
         [HttpPost]
         [EnableCors]
+        [Route(Route.RemoveLike)]
+        public void RemoveLike(RawCommentDto comment) => _repositoryComment.RemoveLike(comment.ToModel());
+
+        [HttpPost]
+        [EnableCors]
         [Route(Route.AddUCL)]
         public void AddUCL(User_CommentLikedDto ucl) => _repositoryUCL.AddUCL(ucl.ToModel());
 

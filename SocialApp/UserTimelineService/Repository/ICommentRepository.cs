@@ -7,6 +7,7 @@ namespace UserTimelineService.Repository
         public Task<IReadOnlyCollection<Comment>> GetComments();
         public Task AddComment(Comment comment);
         public Task AddLike(Comment comment);
+        public Task RemoveLike(Comment comment);
         public Task<IReadOnlyCollection<Comment>> GetHomeTimelineForUserComment(int skip, int take);
     }
 }

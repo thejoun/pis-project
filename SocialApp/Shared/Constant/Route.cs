@@ -20,6 +20,7 @@ public static class Route
     public const string AddPost = "AddPost";
     public const string AddComment = "AddComment";
     public const string AddLike = "AddLike";
+    public const string RemoveLike = "RemoveLike";
     public const string GetHomeTimeline = "GetHomeTimeline";
     public const string GetHomeTimeline2 = "GetHomeTimeline2";
 
@@ -48,6 +49,7 @@ public static class Route
         public const string AddComment = Timeline + "/" + Route.AddComment;
 
         public const string AddLike = Timeline + "/" + Route.AddLike;
+        public const string RemoveLike = Timeline + "/" + Route.RemoveLike;
 
         public const string AddUCL = Timeline + "/" + Route.AddUCL;
         public const string RemoveUCL = Timeline + "/" + Route.RemoveUCL;

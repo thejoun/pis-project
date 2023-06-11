@@ -105,7 +105,7 @@ else
                                 }
                                 else if (UCLs.Find(x => x.UserId == OwnProfile.Id && x.CommentId == comment.Id) != null)
                                 {
-                                    <td>Already liked</td>
+                                    <button class="btn btn-primary" @onclick="() => RemoveLikeComment(comment)">Remove Like</button>
                                 }
                                 else
                                 {
@@ -294,6 +294,7 @@ else
         StateHasChanged();
     }
 
+
     private async Task FetchUserCommentsLikes()
     {
         var url = $"{Route.Request.GetUCL}";
@@ -400,6 +401,23 @@ else
         var url2 = $"{Route.Request.AddUCL}";
         var response2 = await TimelineHttp.PostAsJsonAsync(url2, ucDto);
 
+
+        await FetchComments();
+        await FetchUserCommentsLikes();
+        StateHasChanged();
+        await Init();
+    }
+
+
+    private async void RemoveLikeComment(CommentDto comment)
+    {
+        await FetchUserCommentsLikes();
+
+        var url = $"{Route.Request.RemoveLike}";
+        var response = await TimelineHttp.PostAsJsonAsync(url, comment);
+
+        var url2 = $"{Route.Request.RemoveUCL}";
+        var response2 = await TimelineHttp.PostAsJsonAsync(url2, UCLs.Find(x => x.CommentId == comment.Id));
 
         await FetchComments();
         await FetchUserCommentsLikes();

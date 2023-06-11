@@ -52,6 +52,22 @@ namespace UserTimelineService.Repository
             await _connection.CloseAsync();
         }
 
+
+
+        public async Task RemoveUCL(User_Comment uc)
+        {
+            await _connection.OpenAsync();
+
+            await using var context = new UCLContext(_connectionString);
+
+            var toRemove = context.user_comments.Where(el => el.CommentId == uc.CommentId).ToList();
+            context.user_comments.RemoveRange(toRemove);
+
+            await context.SaveChangesAsync();
+
+            await _connection.CloseAsync();
+        }
+
         public async Task<IReadOnlyCollection<User_Comment>> GetUCL()
         {
             await _connection.OpenAsync();
@@ -65,17 +81,5 @@ namespace UserTimelineService.Repository
             return comments.ToList();
         }
 
-        public async Task RemoveUCL(User_Comment uc)
-        {
-            await _connection.OpenAsync();
-
-            await using var context = new UCLContext(_connectionString);
-
-            await context.user_comments.AddAsync(uc);//!
-
-            await context.SaveChangesAsync();
-
-            await _connection.CloseAsync();
-        }
     }
 }
