@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos;
+using Shared.Exceptions;
 using Shared.Mapping;
 using UserProfileService.Repository;
 using Route = Shared.Constant.Route;
@@ -20,13 +21,44 @@ namespace UserProfileService.Controllers
         }
 
         [HttpGet] [EnableCors] [Route(Route.GetProfileWithHandle)]
-        public UserDto? GetProfile(string user) => _repository.GetUser(user).Result?.ToDto();
-
-        [HttpGet] [EnableCors] [Route(Route.GetProfileWithSub)]
-        public UserDto? GetProfileWithSub(string sub) => _repository.GetUserWithSub(sub).Result?.ToDto();
+        public async Task<ActionResult<UserDto?>> GetProfile(string user)
+        {
+            try
+            {
+                return (await _repository.GetUser(user))?.ToDto();
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
         
+        [HttpGet] [EnableCors] [Route(Route.GetProfileWithSub)]
+        public async Task<ActionResult<UserDto?>> GetProfileWithSub(string sub)
+        {
+            try
+            {
+                return (await _repository.GetUserWithSub(sub))?.ToDto();
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
         [HttpPost] [EnableCors] [Route(Route.CreateProfile)]
-        public void CreateProfile(UserDto user) => _repository.AddUser(user.ToModel());
+        public async Task<IActionResult> CreateProfile(UserDto user)
+        {
+            try
+            {
+                await _repository.AddUser(user.ToModel());
+                return Ok();
+            }
+            catch (AlreadyExistsException e)
+            {
+                return Conflict(e.Message);
+            }
+        }
 
         [HttpGet] [EnableCors] [Route(Route.HasProfileWithSub)]
         public bool IsSubRegistered(string sub) => _repository.HasProfileWithSub(sub).Result;

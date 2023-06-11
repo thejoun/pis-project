@@ -3,7 +3,7 @@
 namespace Shared.Model
 {
     [Table("posts")]
-    public class Post
+    public class Post : IEquatable<Post>
     {
         [Column("id")] public int Id { get; set; }
         public int Author_Id { get; set; }
@@ -12,5 +12,18 @@ namespace Shared.Model
         [Column("creation_time")] public DateTime? Date { get; set; }
         
         [ForeignKey("Author_Id")] public User? Author { get; set; }
+
+        public bool Equals(Post? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            
+            return Id == other.Id 
+                   && Author_Id == other.Author_Id 
+                   && Header == other.Header 
+                   && Content == other.Content 
+                   && Date.ToString() == other.Date.ToString()
+                   && Equals(Author, other.Author);
+        }
     }
 }

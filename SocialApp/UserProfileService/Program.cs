@@ -18,7 +18,7 @@ services.AddOptions();
 services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"));
 
 services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connectionString));
-services.AddScoped<IUserRepository, MySqlUserRepository>();
+services.AddSingleton<IUserRepository, MySqlUserRepository>();
 
 services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader()));
 

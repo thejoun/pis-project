@@ -18,6 +18,12 @@ namespace UserTimelineService.Repository
             _connection = connection;
             _connectionString = connectionStrings.Value.Default;
         }
+        
+        public MySqlPostRepository(MySqlConnection connection, string connectionString)
+        {
+            _connection = connection;
+            _connectionString = connectionString;
+        }
 
         public async Task<IReadOnlyCollection<Post>> GetPosts(string userHandle)
         {
@@ -25,7 +31,9 @@ namespace UserTimelineService.Repository
 
             await using var context = new PostContext(_connectionString);
             
-            var posts = context.Posts.Where(post => post.Author.Handle == userHandle);
+            var posts = context.Posts
+                .Where(post => post.Author.Handle == userHandle)
+                .OrderByDescending(post => post.Date);
 
             await _connection.CloseAsync();
                 
@@ -45,9 +53,24 @@ namespace UserTimelineService.Repository
             await _connection.CloseAsync();
         }
         
+        public async Task DeletePost(int id)
+        {
+            await EnsureConnectionOpen();
+
+            await using var context = new PostContext(_connectionString);
+
+            var toRemove = context.Posts.Where(post => post.Id == id).ToList();
+            
+            context.Posts.RemoveRange(toRemove);
+            
+            await context.SaveChangesAsync();
+
+            await _connection.CloseAsync();
+        }
+        
         public async Task<IReadOnlyCollection<Post>> GetHomeTimelineForUser(string userHandle, int skip, int take)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
 
             await using var context = new PostContext(_connectionString);
 
@@ -65,6 +88,18 @@ namespace UserTimelineService.Repository
             await _connection.CloseAsync();
                 
             return posts.ToList();
+        }
+        
+        private async Task EnsureConnectionOpen()
+        {
+            try
+            {
+                await _connection.OpenAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // already open
+            }
         }
     }
 }
