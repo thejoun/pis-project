@@ -8,11 +8,6 @@ using Route = Shared.Constant.Route;
 
 namespace UserProfileService.Controllers
 {
-    /// <summary>
-    /// Exposed reference to the application's entrypoint (for integration tests only)
-    /// </summary>
-    public partial class Program {}
-    
     [ApiController]
     [Route(Route.Profile)]
     [EnableCors]

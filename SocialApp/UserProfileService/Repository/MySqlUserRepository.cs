@@ -18,10 +18,17 @@ namespace UserProfileService.Repository
             _connection = connection;
             _connectionString = connectionStrings.Value.Default;
         }
+        
+        public MySqlUserRepository(MySqlConnection connection, string connectionString)
+        {
+            _connection = connection;
+            _connectionString = connectionString;
+        }
 
         public async Task<User?> GetUser(string userHandle)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
+            
             await using var context = new UserContext(_connectionString);
             
             // should probably use FindAsync() instead
@@ -40,7 +47,8 @@ namespace UserProfileService.Repository
         
         public async Task<User?> GetUserWithSub(string sub)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
+            
             await using var context = new UserContext(_connectionString);
             
             var user = context.Users.FirstOrDefault(user => user.Sub != null && user.Sub == sub);
@@ -57,7 +65,8 @@ namespace UserProfileService.Repository
         
         public async Task AddUser(User user)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
+            
             await using var context = new UserContext(_connectionString);
             
             if (await context.Users.AnyAsync(u => u.Handle == user.Handle))
@@ -71,7 +80,9 @@ namespace UserProfileService.Repository
                 Email = user.Email,
                 DisplayName = user.DisplayName,
                 Sub = user.Sub,
-                JoinDate = DateTime.Now
+                JoinDate = DateTime.Today,
+                FollowerCount = user.FollowerCount ?? 0,
+                FollowingCount = user.FollowingCount ?? 0
             };
             
             await context.Users.AddAsync(newUser);
@@ -80,10 +91,31 @@ namespace UserProfileService.Repository
             
             await _connection.CloseAsync();
         }
+        
+        public async Task DeleteUser(string handle)
+        {
+            await EnsureConnectionOpen();
+            
+            await using var context = new UserContext(_connectionString);
+            
+            if (await context.Users.AllAsync(u => u.Handle != handle))
+            {
+                throw new NotFoundException($"User with handle '{handle}'");
+            }
+
+            var toRemove = await context.Users.Where(user => user.Handle == handle).ToListAsync();
+
+            context.RemoveRange(toRemove);
+            
+            await context.SaveChangesAsync();
+            
+            await _connection.CloseAsync();
+        }
 
         public async Task<bool> HasProfileWithSub(string sub)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
+            
             await using var context = new UserContext(_connectionString);
 
             var found = await context.Users.AnyAsync(user => user.Sub == sub);
@@ -92,10 +124,11 @@ namespace UserProfileService.Repository
 
             return found;
         }
-        
+
         public async Task<bool> HasProfileWithHandle(string handle)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
+            
             await using var context = new UserContext(_connectionString);
 
             var found = await context.Users.AnyAsync(user => user.Handle == handle);
@@ -103,6 +136,18 @@ namespace UserProfileService.Repository
             await _connection.CloseAsync();
 
             return found;
+        }
+
+        private async Task EnsureConnectionOpen()
+        {
+            try
+            {
+                await _connection.OpenAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // already open
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shared.Model;
+using Tests.Extensions;
 using UserProfileService.Repository;
 using Xunit;
 
-namespace Tests.Integration;
+namespace Tests.Controller;
 
 /// <summary>
 /// These tests are here to make sure that the Controller emits correct responses
@@ -34,22 +34,10 @@ public partial class ProfileControllerTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var application = new WebApplicationFactory<UserProfileService.Controllers.Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureServices(services =>
-                {
-                    var existingRepository = services
-                        .FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IUserRepository));
-
-                    if (existingRepository is not null)
-                    {
-                        services.Remove(existingRepository);
-                    }
-                    
-                    services.AddSingleton(_mock.Object);
-                });
-            });
+        var application = new WebApplicationFactory<UserProfileService.Program>()
+            .WithWebHostBuilder(builder => builder
+                .ConfigureServices(collection => collection
+                    .ReplaceWithSingleton(_mock.Object)));
 
         _httpClient = application.CreateClient();
     }

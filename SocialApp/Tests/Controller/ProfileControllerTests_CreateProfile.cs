@@ -6,7 +6,7 @@ using Shared.Exceptions;
 using Shared.Model;
 using Xunit;
 
-namespace Tests.Integration;
+namespace Tests.Controller;
 
 public partial class ProfileControllerTests
 {

@@ -2,7 +2,7 @@
 using Shared.Constant;
 using Xunit;
 
-namespace Tests.Integration;
+namespace Tests.Controller;
 
 public partial class ProfileControllerTests
 {
