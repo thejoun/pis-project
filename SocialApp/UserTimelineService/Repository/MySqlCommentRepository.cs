@@ -18,10 +18,16 @@ namespace UserTimelineService.Repository
             _connection = connection;
             _connectionString = connectionStrings.Value.Default;
         }
+        
+        public MySqlCommentRepository(MySqlConnection connection, string connectionString)
+        {
+            _connection = connection;
+            _connectionString = connectionString;
+        }
 
         public async Task<IReadOnlyCollection<Comment>> GetComments()
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
 
             await using var context = new CommentContext(_connectionString);
 
@@ -31,13 +37,42 @@ namespace UserTimelineService.Repository
 
             return comments.ToList();
         }
+        
+        public async Task<IReadOnlyCollection<Comment>> GetComments(int postId)
+        {
+            await EnsureConnectionOpen();
+
+            await using var context = new CommentContext(_connectionString);
+
+            var comments = context.Comments
+                .Where(comment => comment.PostId == postId);
+
+            await _connection.CloseAsync();
+
+            return comments.ToList();
+        }
 
         public async Task AddComment(Comment comment)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
+
             await using var context = new CommentContext(_connectionString);
             await context.Comments.AddAsync(comment);
-            // context.Entry(comment.Author).State = EntityState.Unchanged;
+            await context.SaveChangesAsync();
+
+            await _connection.CloseAsync();
+        }
+        
+        public async Task DeleteComment(int commentId)
+        {
+            await EnsureConnectionOpen();
+
+            await using var context = new CommentContext(_connectionString);
+
+            var toDelete = context.Comments.Where(comment => comment.Id == commentId);
+            
+            context.Comments.RemoveRange(toDelete);
+            
             await context.SaveChangesAsync();
 
             await _connection.CloseAsync();
@@ -45,7 +80,7 @@ namespace UserTimelineService.Repository
 
         public async Task AddLike(Comment comment)
         {
-            await _connection.OpenAsync();
+            await EnsureConnectionOpen();
 
             await using var context = new CommentContext(_connectionString);
 
@@ -59,22 +94,34 @@ namespace UserTimelineService.Repository
         }
 
 
-        public async Task<IReadOnlyCollection<Comment>> GetHomeTimelineForUserComment(int skip, int take)
+        // public async Task<IReadOnlyCollection<Comment>> GetHomeTimelineForUserComment(int skip, int take)
+        // {
+        //     await _connection.OpenAsync();
+        //
+        //     await using var context = new CommentContext(_connectionString);
+        //
+        //     var comments = context.Comments
+        //         //.Include(comment => comment.Author)
+        //         //.Where(comment => following.Contains(comment.Author_Id))
+        //         .OrderByDescending(comment => comment.Date)
+        //         .Skip(skip)
+        //         .Take(take);
+        //
+        //     await _connection.CloseAsync();
+        //
+        //     return comments.ToList();
+        // }
+        
+        private async Task EnsureConnectionOpen()
         {
-            await _connection.OpenAsync();
-
-            await using var context = new CommentContext(_connectionString);
-
-            var comments = context.Comments
-                //.Include(comment => comment.Author)
-                //.Where(comment => following.Contains(comment.Author_Id))
-                .OrderByDescending(comment => comment.Date)
-                .Skip(skip)
-                .Take(take);
-
-            await _connection.CloseAsync();
-
-            return comments.ToList();
+            try
+            {
+                await _connection.OpenAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // already open
+            }
         }
     }
 }

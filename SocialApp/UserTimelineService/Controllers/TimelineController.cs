@@ -74,11 +74,12 @@ namespace UserTimelineService.Controllers
         public IEnumerable<PostDto> GetHomeTimelineForUser(string user, int skip, int take)
             => _repository.GetHomeTimelineForUser(user, skip, take).Result.Select(post => post.ToDto());
 
-        [HttpGet]
-        [EnableCors]
-        [Route(Route.GetHomeTimeline2)]
-        public IEnumerable<CommentDto> GetHomeTimelineForUserComment(int skip, int take)
-                    => _repositoryComment.GetHomeTimelineForUserComment(skip, take).Result.Select(comment => comment.ToDto());
+        // not sure what it was supposed to do
+        // [HttpGet]
+        // [EnableCors]
+        // [Route(Route.GetHomeTimeline2)]
+        // public IEnumerable<CommentDto> GetHomeTimelineForUserComment(int skip, int take)
+        //             => _repositoryComment.GetHomeTimelineForUserComment(skip, take).Result.Select(comment => comment.ToDto());
 
         [Obsolete]
         [HttpGet]
