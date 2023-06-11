@@ -13,7 +13,9 @@ public static class CommentMappingExtensions
             Id = comment.Id,
             Author = comment.Author?.ToDto(),
             Content = comment.Content,
-            Date = comment.Date
+            Date = comment.Date,
+            likes = comment.likes,
+            AuthorName = comment.AuthorName,
         };
     }
 
@@ -25,7 +27,9 @@ public static class CommentMappingExtensions
             Id = comment.Id,
             Author = comment.Author?.ToModel(),
             Content = comment.Content,
-            Date = comment.Date
+            Date = comment.Date,
+            likes = comment.likes,
+            AuthorName = comment.AuthorName,
         };
     }
 }

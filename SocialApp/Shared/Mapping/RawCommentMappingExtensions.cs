@@ -11,9 +11,11 @@ public static class RawCommentMappingExtensions
         {
             PostId = comment.PostId,
             Id = comment.Id,
-            AuthorId = comment.Author_Id,
+            AuthorId = comment.Author?.Id,
             Content = comment.Content,
-            Date = comment.Date
+            Date = comment.Date,
+            likes = comment.likes,
+            AuthorName = comment.AuthorName,
         };
     }
 
@@ -25,7 +27,9 @@ public static class RawCommentMappingExtensions
             Id = comment.Id,
             Author_Id = comment.AuthorId,
             Content = comment.Content,
-            Date = comment.Date
+            Date = comment.Date,
+            likes = comment.likes,
+            AuthorName = comment.AuthorName,
         };
     }
 }

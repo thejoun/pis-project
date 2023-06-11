@@ -44,6 +44,12 @@ namespace UserTimelineService.Controllers
         [Route(Route.AddComment)]
         public void AddComment(RawCommentDto comment) => _repositoryComment.AddComment(comment.ToModel());
 
+        [HttpPost]
+        [EnableCors]
+        [Route(Route.AddLike)]
+        public void AddLike(RawCommentDto comment) => _repositoryComment.AddLike(comment.ToModel());
+
+
         [HttpGet]
         [EnableCors]
         [Route(Route.GetHomeTimeline)]

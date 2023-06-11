@@ -8,6 +8,7 @@ public static class Route
 
     public const string GetProfileWithHandle = "GetProfile";
     public const string GetProfileWithSub = "GetProfileWithSub";
+    
     public const string CreateProfile = "CreateProfile";
     public const string HasProfileWithSub = "HasProfileWithSub";
     public const string HasProfileWithHandle = "HasProfileWithHandle";
@@ -17,6 +18,7 @@ public static class Route
     public const string GetComments = "GetComments";
     public const string AddPost = "AddPost";
     public const string AddComment = "AddComment";
+    public const string AddLike = "AddLike";
     public const string GetHomeTimeline = "GetHomeTimeline";
     public const string GetHomeTimeline2 = "GetHomeTimeline2";
 
@@ -39,6 +41,8 @@ public static class Route
         public const string GetComments = Timeline + "/" + Route.GetComments;
         public const string AddPost = Timeline + "/" + Route.AddPost;
         public const string AddComment = Timeline + "/" + Route.AddComment;
+
+        public const string AddLike = Timeline + "/" + Route.AddLike;
 
         public static string GetHomeTimeline(string? user, int skip, int take)
             => Timeline + "/" + Route.GetHomeTimeline + $"?user={user}&skip={skip}&take={take}";
