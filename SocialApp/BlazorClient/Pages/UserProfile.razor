@@ -167,9 +167,9 @@ else
     private UserDto? User;
     private List<PostDto>? Posts;
     private List<CommentDto>? Comments;
-    private List<User_CommentLikedDto>? UCLs;
+    private List<User_CommentLikedDto> UCLs = new();
 
-    private List<User_PostLikedDto>? UPLs;
+    private List<User_PostLikedDto> UPLs = new();
     private UserDto? OwnProfile;
 
     private int UserId;
@@ -330,7 +330,7 @@ else
     {
         var url = $"{Route.Request.GetUPL}";
         UPLs = (await TimelineHttp.GetFromJsonAsync<User_PostLikedDto[]>(url) ??
-        Enumerable.Empty<User_PostLikedDto>()).ToList();
+        Enumerable.Empty<User_PostLikedDto>()).Where(a => a != null).ToList();
 
         StateHasChanged();
     }
