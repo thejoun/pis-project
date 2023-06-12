@@ -187,13 +187,14 @@ else
     private bool CheckedFollow;
 
     private bool? IsOwnProfile => User is null || OwnProfile is null
-    ? null
-    : User?.Handle == OwnProfile?.Handle;
+        ? null
+        : User?.Handle == OwnProfile?.Handle;
 
     protected override async Task OnInitializedAsync()
     {
         TimelineHttp = HttpClientFactory.CreateClient(HttpService.Timeline);
         ProfileHttp = HttpClientFactory.CreateClient(HttpService.Profile);
+        FollowHttp = HttpClientFactory.CreateClient(HttpService.Follow);
 
         Sub = await AuthenticationStateProvider.GetGoogleUserSub();
 
@@ -366,25 +367,28 @@ else
     private async void AddComment(int id)
     {
         AddCommentSelectedPostId = id;
+        
+        StateHasChanged();
     }
 
     private async void RemoveComment()
     {
         AddCommentSelectedPostId = -1;
+        
+        StateHasChanged();
     }
 
     private async void Comment()
     {
         var comment = new RawCommentDto()
-            {
-                PostId = AddCommentSelectedPostId,
-                AuthorId = UserId,
-                Content = Content,
-                Date = DateTime.Now,
-                likes = 0,
-                AuthorName = OwnProfile.DisplayName,
-            };
-
+        {
+            PostId = AddCommentSelectedPostId,
+            AuthorId = UserId,
+            Content = Content,
+            Date = DateTime.Now,
+            likes = 0,
+            AuthorName = OwnProfile.DisplayName,
+        };
 
         var url = $"{Route.Request.AddComment}";
         var response = await TimelineHttp.PostAsJsonAsync(url, comment);
@@ -403,7 +407,10 @@ else
         RemoveComment();
 
         await FetchUserCommentsLikes();
-        await Init();
+        
+        // not needed
+        // await Init();
+        
         StateHasChanged();
     }
 
@@ -420,9 +427,7 @@ else
             };
         var url = $"{Route.Request.AddLike}";
         var response = await TimelineHttp.PostAsJsonAsync(url, rawComment);
-
-
-
+        
         User_CommentLikedDto ucDto = new User_CommentLikedDto
             {
                 UserId = OwnProfile.Id,
@@ -430,12 +435,14 @@ else
             };
         var url2 = $"{Route.Request.AddUCL}";
         var response2 = await TimelineHttp.PostAsJsonAsync(url2, ucDto);
-
-
+        
         await FetchComments();
         await FetchUserCommentsLikes();
+        
         StateHasChanged();
-        await Init();
+        
+        // not needed
+        // await Init();
     }
 
 
@@ -451,8 +458,11 @@ else
 
         await FetchComments();
         await FetchUserCommentsLikes();
+        
         StateHasChanged();
-        await Init();
+        
+        // not needed
+        // await Init();
     }
 
     private async void LikePost(PostDto post)
