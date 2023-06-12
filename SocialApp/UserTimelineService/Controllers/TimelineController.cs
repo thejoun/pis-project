@@ -16,15 +16,16 @@ namespace UserTimelineService.Controllers
         private readonly ILogger<TimelineController> _logger;
         private readonly IPostRepository _repository;
         private readonly ICommentRepository _repositoryComment;
-
+        private readonly IUPLRepository _repositoryUPL;
         private readonly IUCLRepository _repositoryUCL;
 
-        public TimelineController(IPostRepository repository, ILogger<TimelineController> logger, ICommentRepository repositoryComment, IUCLRepository repositoryUCL)
+        public TimelineController(IPostRepository repository, ILogger<TimelineController> logger, ICommentRepository repositoryComment, IUCLRepository repositoryUCL, IUPLRepository repositoryUPL)
         {
             _logger = logger;
             _repository = repository;
             _repositoryComment = repositoryComment;
             _repositoryUCL = repositoryUCL;
+            _repositoryUPL = repositoryUPL;
         }
 
         [HttpGet]
@@ -41,6 +42,11 @@ namespace UserTimelineService.Controllers
         [EnableCors]
         [Route(Route.GetUCL)]
         public IEnumerable<User_CommentLikedDto> GetUCL() => _repositoryUCL.GetUCL().Result.Select(ucl => ucl.ToDto());
+
+        [HttpGet]
+        [EnableCors]
+        [Route(Route.GetUPL)]
+        public IEnumerable<User_PostLikedDto> GetUPL() => _repositoryUPL.GetUPL().Result.Select(upl => upl.ToDto());
 
         [HttpPost]
         [EnableCors]
@@ -71,6 +77,29 @@ namespace UserTimelineService.Controllers
         [EnableCors]
         [Route(Route.RemoveUCL)]
         public void RemoveUCL(User_CommentLikedDto ucl) => _repositoryUCL.RemoveUCL(ucl.ToModel());
+
+
+        [HttpPost]
+        [EnableCors]
+        [Route(Route.AddLikePost)]
+        public void AddLikePost(RawPostDto post) => _repository.AddLikePost(post.ToModel());
+
+        [HttpPost]
+        [EnableCors]
+        [Route(Route.RemoveLikePost)]
+        public void RemoveLikePost(RawPostDto post) => _repository.RemoveLikePost(post.ToModel());
+
+        [HttpPost]
+        [EnableCors]
+        [Route(Route.AddUPL)]
+        public void AddUPL(User_PostLikedDto upl) => _repositoryUPL.AddUPL(upl.ToModel());
+
+        [HttpPost]
+        [EnableCors]
+        [Route(Route.RemoveUPL)]
+        public void RemoveUPL(User_PostLikedDto upl) => _repositoryUPL.RemoveUPL(upl.ToModel());
+
+
 
 
         [HttpGet]

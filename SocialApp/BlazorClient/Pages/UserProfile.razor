@@ -82,6 +82,24 @@ else
                     <td>@post.Header</td>
                     <td>@post.Date?.ToShortDateString() @post.Date?.ToShortTimeString()</td>
                     <td>@post.Content</td>
+
+                    <td>Likes: @UPLs.Count(x => x.PostId == post.Id);</td>
+                    @if (UPLs == null)
+                    {
+                        <button class="btn btn-primary" @onclick="() => LikePost(post)">Like</button>
+                    }
+                    else if (UPLs.Count == 0)
+                    {
+                        <button class="btn btn-primary" @onclick="() => LikePost(post)">Like</button>
+                    }
+                    else if (UPLs.Find(x => x.UserId == OwnProfile.Id && x.PostId == post.Id) != null)
+                    {
+                        <button class="btn btn-primary" @onclick="() => RemoveLikePost(post)">Remove Like</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" @onclick="() => LikePost(post)">Like</button>
+                    }
                 </tr>
 
                 @if (Comments != null)
@@ -150,6 +168,8 @@ else
     private List<PostDto>? Posts;
     private List<CommentDto>? Comments;
     private List<User_CommentLikedDto>? UCLs;
+
+    private List<User_PostLikedDto>? UPLs;
     private UserDto? OwnProfile;
 
     private int UserId;
@@ -208,6 +228,7 @@ else
         FetchPosts();
         FetchComments();
         FetchUserCommentsLikes();
+        FetchUserPostsLikes();
 
         if (await AuthenticationStateProvider.GetGoogleUserSub() != null)
         {
@@ -300,6 +321,15 @@ else
         var url = $"{Route.Request.GetUCL}";
         UCLs = (await TimelineHttp.GetFromJsonAsync<User_CommentLikedDto[]>(url) ??
         Enumerable.Empty<User_CommentLikedDto>()).ToList();
+
+        StateHasChanged();
+    }
+
+    private async Task FetchUserPostsLikes()
+    {
+        var url = $"{Route.Request.GetUPL}";
+        UPLs = (await TimelineHttp.GetFromJsonAsync<User_PostLikedDto[]>(url) ??
+        Enumerable.Empty<User_PostLikedDto>()).ToList();
 
         StateHasChanged();
     }
@@ -421,6 +451,53 @@ else
 
         await FetchComments();
         await FetchUserCommentsLikes();
+        StateHasChanged();
+        await Init();
+    }
+
+    private async void LikePost(PostDto post)
+    {
+        RawPostDto rawPost = new RawPostDto
+            {
+                Id = post.Id,
+                Content = post.Content,
+                Header = post.Header,
+                Date = post.Date,
+                likes = post.likes,
+                AuthorId = User.Id,//!!
+            };
+
+        var url = $"{Route.Request.AddLike}";
+        var response = await TimelineHttp.PostAsJsonAsync(url, rawPost);
+
+        User_PostLikedDto ucDto = new User_PostLikedDto
+            {
+                UserId = OwnProfile.Id,
+                PostId = post.Id,
+            };
+        var url2 = $"{Route.Request.AddUPL}";
+        var response2 = await TimelineHttp.PostAsJsonAsync(url2, ucDto);
+        post.likes += 1;
+
+        await FetchPosts();
+        await FetchUserPostsLikes();
+        StateHasChanged();
+        await Init();
+    }
+
+
+    private async void RemoveLikePost(PostDto post)
+    {
+        await FetchUserPostsLikes();
+
+        var url = $"{Route.Request.RemoveLike}";
+        var response = await TimelineHttp.PostAsJsonAsync(url, post);
+
+        var url2 = $"{Route.Request.RemoveUPL}";
+        var response2 = await TimelineHttp.PostAsJsonAsync(url2, UPLs.Find(x => x.PostId == post.Id));
+        post.likes -= 1;
+        await FetchPosts();
+        await FetchUserPostsLikes();
         StateHasChanged();
         await Init();
     }

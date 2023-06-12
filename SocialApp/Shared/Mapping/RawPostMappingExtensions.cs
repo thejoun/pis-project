@@ -13,7 +13,8 @@ public static class RawPostMappingExtensions
             AuthorId = post.Author_Id,
             Header = post.Header,
             Content = post.Content,
-            Date = post.Date
+            Date = post.Date,
+            likes = post.likes,
         };
     }
 
@@ -25,7 +26,8 @@ public static class RawPostMappingExtensions
             Author_Id = post.AuthorId,
             Header = post.Header,
             Content = post.Content,
-            Date = post.Date
+            Date = post.Date,
+            likes = post.likes,
         };
     }
 }

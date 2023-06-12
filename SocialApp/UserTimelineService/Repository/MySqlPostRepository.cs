@@ -18,7 +18,7 @@ namespace UserTimelineService.Repository
             _connection = connection;
             _connectionString = connectionStrings.Value.Default;
         }
-        
+
         public MySqlPostRepository(MySqlConnection connection, string connectionString)
         {
             _connection = connection;
@@ -30,29 +30,29 @@ namespace UserTimelineService.Repository
             await _connection.OpenAsync();
 
             await using var context = new PostContext(_connectionString);
-            
+
             var posts = context.Posts
                 .Where(post => post.Author.Handle == userHandle)
                 .OrderByDescending(post => post.Date);
 
             await _connection.CloseAsync();
-                
+
             return posts.ToList();
         }
-        
+
         public async Task AddPost(Post post)
         {
             await _connection.OpenAsync();
 
             await using var context = new PostContext(_connectionString);
-            
+
             await context.Posts.AddAsync(post);
             // context.Entry(post.Author).State = EntityState.Unchanged;
             await context.SaveChangesAsync();
 
             await _connection.CloseAsync();
         }
-        
+
         public async Task DeletePost(int id)
         {
             await EnsureConnectionOpen();
@@ -60,14 +60,46 @@ namespace UserTimelineService.Repository
             await using var context = new PostContext(_connectionString);
 
             var toRemove = context.Posts.Where(post => post.Id == id).ToList();
-            
+
             context.Posts.RemoveRange(toRemove);
-            
+
             await context.SaveChangesAsync();
 
             await _connection.CloseAsync();
         }
-        
+
+
+        public async Task AddLikePost(Post post)
+        {
+            await EnsureConnectionOpen();
+
+            await using var context = new PostContext(_connectionString);
+
+            Post c = context.Posts.FirstOrDefault(i => i.Id == post.Id);
+            c.likes += 1;
+            post.likes += 1;
+
+            await context.SaveChangesAsync();
+
+            await _connection.CloseAsync();
+        }
+
+        public async Task RemoveLikePost(Post post)
+        {
+            await _connection.OpenAsync();
+
+            await using var context = new PostContext(_connectionString);
+
+            Post c = context.Posts.FirstOrDefault(i => i.Id == post.Id);
+            c.likes -= 1;
+            post.likes -= 1;
+
+            await context.SaveChangesAsync();
+
+            await _connection.CloseAsync();
+        }
+
+
         public async Task<IReadOnlyCollection<Post>> GetHomeTimelineForUser(string userHandle, int skip, int take)
         {
             await EnsureConnectionOpen();
@@ -86,10 +118,10 @@ namespace UserTimelineService.Repository
                 .Take(take);
 
             await _connection.CloseAsync();
-                
+
             return posts.ToList();
         }
-        
+
         private async Task EnsureConnectionOpen()
         {
             try

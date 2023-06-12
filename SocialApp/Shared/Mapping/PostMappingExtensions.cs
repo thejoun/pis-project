@@ -13,7 +13,8 @@ public static class PostMappingExtensions
             Author = post.Author?.ToDto(),
             Header = post.Header,
             Content = post.Content,
-            Date = post.Date
+            Date = post.Date,
+            likes = post.likes
         };
     }
 
@@ -25,7 +26,8 @@ public static class PostMappingExtensions
             Author = post.Author?.ToModel(),
             Header = post.Header,
             Content = post.Content,
-            Date = post.Date
+            Date = post.Date,
+            likes = post.likes
         };
     }
 }

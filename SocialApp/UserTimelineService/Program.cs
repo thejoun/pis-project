@@ -21,6 +21,7 @@ services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connectionString
 services.AddScoped<IPostRepository, MySqlPostRepository>();
 services.AddScoped<ICommentRepository, MySqlCommentRepository>();
 services.AddScoped<IUCLRepository, MySqlUCLRepository>();
+services.AddScoped<IUPLRepository, MySqlUPLRepository>();
 
 services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader()));
 

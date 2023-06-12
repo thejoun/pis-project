@@ -17,15 +17,21 @@ public static class Route
     public const string GetCommentsForUserHandle = "GetComments";
     public const string GetComments = "GetComments";
     public const string GetUCL = "GetUCL";
+    public const string GetUPL = "GetUPL";
     public const string AddPost = "AddPost";
     public const string AddComment = "AddComment";
     public const string AddLike = "AddLike";
     public const string RemoveLike = "RemoveLike";
+    public const string AddLikePost = "AddLikePost";
+    public const string RemoveLikePost = "RemoveLikePost";
     public const string GetHomeTimeline = "GetHomeTimeline";
     public const string GetHomeTimeline2 = "GetHomeTimeline2";
 
     public const string AddUCL = "AddUCL";
     public const string RemoveUCL = "RemoveUCL";
+
+    public const string AddUPL = "AddUPL";
+    public const string RemoveUPL = "RemoveUPL";
 
     public const string GetFollowers = "GetFollowers";
     public const string GetFollowing = "GetFollowing";
@@ -45,6 +51,7 @@ public static class Route
         public const string GetCommentsForUserHandle = Timeline + "/" + Route.GetCommentsForUserHandle + "?user=";
         public const string GetComments = Timeline + "/" + Route.GetComments;
         public const string GetUCL = Timeline + "/" + Route.GetUCL;
+        public const string GetUPL = Timeline + "/" + Route.GetUPL;
         public const string AddPost = Timeline + "/" + Route.AddPost;
         public const string AddComment = Timeline + "/" + Route.AddComment;
 
@@ -53,6 +60,9 @@ public static class Route
 
         public const string AddUCL = Timeline + "/" + Route.AddUCL;
         public const string RemoveUCL = Timeline + "/" + Route.RemoveUCL;
+
+        public const string AddUPL = Timeline + "/" + Route.AddUPL;
+        public const string RemoveUPL = Timeline + "/" + Route.RemoveUPL;
 
         public static string GetHomeTimeline(string? user, int skip, int take)
             => Timeline + "/" + Route.GetHomeTimeline + $"?user={user}&skip={skip}&take={take}";
